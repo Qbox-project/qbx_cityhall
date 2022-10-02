@@ -5,7 +5,7 @@ City Services for QB-Core Framework
 - [qb-core](https://github.com/QBCore-Remastered/qb-core) (Required)
 - [ox-target](https://github.com/overextended/ox_target) (Optional)
 - [ox_lib](https://github.com/overextended/ox_lib) (Required)
-- [qb-phone](https://github.com/qbcore-framework/qb-phone) (Required)
+- [qb-phone](https://github.com/QBCore-Remastered/qb-phone) (Required)
 
 ## Features
 - Ability to request id card when lost
