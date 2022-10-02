@@ -23,6 +23,24 @@ local function getClosestHall()
     return closest
 end
 
+local function pairsInOrder(object, _)
+    local a = {}
+    for n in pairs(object) do
+        table.insert(a, n)
+    end
+    table.sort(a, _)
+    local i = 0
+    local iterator = function()
+        i = i + 1
+        if a[i] == nil then
+            return nil
+        else
+            return a[i], object[a[i]]
+        end
+    end
+    return iterator
+end
+
 local function OpenCityhallIdentityMenu(closestCityhall)
     local licensesMeta = PlayerData.metadata["licences"]
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
@@ -32,7 +50,7 @@ local function OpenCityhallIdentityMenu(closestCityhall)
         end
     end
     local identityOptions = {}
-    for item, id in pairs(availableLicenses) do
+    for item, id in pairsInOrder(availableLicenses) do
         identityOptions[#identityOptions + 1] = {
             title = id.label,
             description = ('Price: $%s'):format(id.cost),
@@ -61,7 +79,7 @@ end
 local function OpenCityhallEmploymentMenu(closestCityhall)
     lib.callback('qb-cityhall:server:receiveJobs', false, function(result)
         local jobOptions = {}
-        for job, label in pairs(result) do
+        for job, label in pairsInOrder(result) do
             jobOptions[#jobOptions + 1] = {
                 title = label,
                 onSelect = function()
