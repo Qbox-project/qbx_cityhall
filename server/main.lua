@@ -75,11 +75,16 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
     local itemInfo = Config.Cityhalls[hall].licenses[item]
-    if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then 
+    if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return TriggerClientEvent('ox_lib:notify', src, {
-            title = 'Alert',
+            id = 'no_money',
             description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost),
-            type = 'error'
+            style = {
+                backgroundColor = '#141517',
+                color = '#ededed'
+            },
+            icon = 'xmark',
+            iconColor = '#C0392B'
         })
     end
     local info = {}
@@ -105,9 +110,14 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.AddItem(item, 1, nil, info) then return end
     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
     TriggerClientEvent('ox_lib:notify', src, {
-        title = 'Alert',
+        id = 'get_item_' .. QBCore.Shared.Items[item].label,
         description = ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost),
-        type = 'success'
+        style = {
+            backgroundColor = '#141517',
+            color = '#ededed'
+        },
+        icon = 'check',
+        iconColor = '#27AE60'
     })
 end)
 
@@ -128,16 +138,21 @@ RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
             local mailData = {
                 sender = "Township",
                 subject = "Driving lessons request",
-                message = "Hello,<br><br>We have just received a message that someone wants to take driving lessons.<br>If you are willing to teach, please contact them:<br>Name: <strong>".. Player.PlayerData.charinfo.firstname .. " " .. Player.PlayerData.charinfo.lastname .. "<br />Phone Number: <strong>"..Player.PlayerData.charinfo.phone.."</strong><br><br>Kind regards,<br>Township Los Santos",
+                message = "Hello,<br><br>We have just received a message that someone wants to take driving lessons.<br>If you are willing to teach, please contact them:<br>Name: <strong>" .. Player.PlayerData.charinfo.firstname .. " " .. Player.PlayerData.charinfo.lastname .. "<br />Phone Number: <strong>" .. Player.PlayerData.charinfo.phone .. "</strong><br><br>Kind regards,<br>Township Los Santos",
                 button = {}
             }
             TriggerEvent("qb-phone:server:sendNewMailToOffline", citizenid, mailData)
         end
     end
     TriggerClientEvent('ox_lib:notify', source, {
-        title = 'Alert',
-        description = "An email has been sent to driving schools, and you will be contacted automatically",
-        type = 'success'
+        id = 'sent_email',
+        description = 'An email has been sent to driving schools, and you will be contacted automatically',
+        style = {
+            backgroundColor = '#141517',
+            color = '#ededed'
+        },
+        icon = 'check',
+        iconColor = '#27AE60'
     })
 end)
 
@@ -149,15 +164,19 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     local pedCoords = GetEntityCoords(ped)
     local closestCityhall = getClosestHall(pedCoords)
     local cityhallCoords = Config.Cityhalls[closestCityhall].coords
-    local JobInfo = QBCore.Shared.Jobs[job]
     if #(pedCoords - cityhallCoords) >= 20.0 or not availableJobs[job] then
         return DropPlayer(source, "Attempted exploit abuse")
     end
     Player.Functions.SetJob(job, 0)
     TriggerClientEvent('ox_lib:notify', source, {
-        title = 'Alert',
-        description = Lang:t('info.new_job'),
-        type = 'success'
+        id = 'new_job_' .. job,
+        description = Lang:t('info.new_job', { job = job }),
+        style = {
+            backgroundColor = '#141517',
+            color = '#ededed'
+        },
+        icon = 'check',
+        iconColor = '#27AE60'
     })
 end)
 
@@ -165,7 +184,7 @@ RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
 
 -- Commands
 
-QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", {{"id", "ID of a person"}}, true, function(source, args)
+QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", { { "id", "ID of a person" } }, true, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local SearchedPlayer = QBCore.Functions.GetPlayer(tonumber(args[1]))
     if SearchedPlayer then
@@ -176,14 +195,25 @@ QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", {{"id
                         SearchedPlayer.PlayerData.metadata["licences"]["driver"] = true
                         SearchedPlayer.Functions.SetMetaData("licences", SearchedPlayer.PlayerData.metadata["licences"])
                         TriggerClientEvent('ox_lib:notify', source, {
-                            title = 'Alert',
-                            description = "You have passed! Pick up your drivers license at the town hall",
-                            type = 'success'
+                            id = 'test_passed',
+                            description = 'You have passed! Pick up your drivers license at the town hall',
+                            style = {
+                                backgroundColor = '#141517',
+                                color = '#ededed'
+                            },
+                            icon = 'check',
+                            iconColor = '#27AE60'
                         })
                         TriggerClientEvent('ox_lib:notify', source, {
-                            title = 'Alert',
-                            description = ("Player with ID %s has been granted access to a driving license"):format(SearchedPlayer.PlayerData.source),
-                            type = 'success'
+                            id = 'license_granted',
+                            description = ("Player with ID %s has been granted access to a driving license"):format(SearchedPlayer
+                                .PlayerData.source),
+                            style = {
+                                backgroundColor = '#141517',
+                                color = '#ededed'
+                            },
+                            icon = 'check',
+                            iconColor = '#27AE60'
                         })
                         break
                     end
@@ -191,16 +221,26 @@ QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", {{"id
             end
         else
             TriggerClientEvent('ox_lib:notify', source, {
-                title = 'Alert',
-                description = "Can't give permission for a drivers license, this person already has permission",
-                type = 'error'
+                id = 'has_license',
+                description = 'Can\'t give permission for a drivers license, this person already has permission',
+                style = {
+                    backgroundColor = '#141517',
+                    color = '#ededed'
+                },
+                icon = 'check',
+                iconColor = '#27AE60'
             })
         end
     else
         TriggerClientEvent('ox_lib:notify', source, {
-            title = 'Alert',
-            description = "Player Not Online",
-            type = 'error'
+            id = 'not_online',
+            description = 'Player Not Online',
+            style = {
+                backgroundColor = '#141517',
+                color = '#ededed'
+            },
+            icon = 'check',
+            iconColor = '#27AE60'
         })
     end
 end)
