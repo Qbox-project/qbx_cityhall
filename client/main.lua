@@ -1,13 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
-local isLoggedIn = LocalPlayer.state.isLoggedIn
-local playerPed = PlayerPedId()
-local playerCoords = GetEntityCoords(playerPed)
-local closestCityhall = nil
-local closestDrivingSchool = nil
-local inCityhallPage = false
-local inRangeCityhall = false
-local inRangeDrivingSchool = false
+local inRangeCityhall, inRangeDrivingSchool = false, false
 local pedsSpawned = false
 local table_clone = table.clone
 local blips = {}
@@ -15,6 +8,8 @@ local blips = {}
 -- Functions
 
 local function getClosestHall()
+    local playerPed = PlayerPedId()
+    local playerCoords = GetEntityCoords(playerPed)
     local distance = #(playerCoords - Config.Cityhalls[1].coords)
     local closest = 1
     for i = 1, #Config.Cityhalls do
@@ -28,29 +23,116 @@ local function getClosestHall()
     return closest
 end
 
-local function getClosestSchool()
-    local distance = #(playerCoords - Config.DrivingSchools[1].coords)
-    local closest = 1
-    for i = 1, #Config.DrivingSchools do
-        local school = Config.DrivingSchools[i]
-        local dist = #(playerCoords - school.coords)
-        if dist < distance then
-            distance = dist
-            closest = i
+local function pairsInOrder(object, _)
+    local a = {}
+    for n in pairs(object) do
+        table.insert(a, n)
+    end
+    table.sort(a, _)
+    local i = 0
+    local iterator = function()
+        i = i + 1
+        if a[i] == nil then
+            return nil
+        else
+            return a[i], object[a[i]]
         end
     end
-    return closest
+    return iterator
 end
 
-local function setCityhallPageState(bool, message)
-    if message then
-        local action = bool and "open" or "close"
-        SendNUIMessage({
-            action = action
-        })
+local function OpenCityhallIdentityMenu(closestCityhall)
+    local licensesMeta = PlayerData.metadata["licences"]
+    local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
+    for license, data in pairs(availableLicenses) do
+        if data.metadata and not licensesMeta[data.metadata] then
+            availableLicenses[license] = nil
+        end
     end
-    SetNuiFocus(bool, bool)
-    inCityhallPage = bool
+    local identityOptions = {}
+    for item, id in pairsInOrder(availableLicenses) do
+        identityOptions[#identityOptions + 1] = {
+            title = id.label,
+            description = ('Price: $%s'):format(id.cost),
+            onSelect = function()
+                TriggerServerEvent('qb-cityhall:server:requestId', item, closestCityhall)
+                if not Config.UseTarget and inRangeCityhall then 
+                    lib.showTextUI('[E] Open Cityhall') 
+                end
+            end
+        }
+    end
+    lib.registerContext({
+        id = 'cityhall_identity_menu',
+        title = 'Identity',
+        menu = 'cityhall_menu',
+        onExit = function()
+            if not Config.UseTarget and inRangeCityhall then 
+                lib.showTextUI('[E] Open Cityhall') 
+            end
+        end,
+        options = identityOptions
+    })
+    lib.showContext('cityhall_identity_menu')
+end
+
+local function OpenCityhallEmploymentMenu(closestCityhall)
+    lib.callback('qb-cityhall:server:receiveJobs', false, function(result)
+        local jobOptions = {}
+        for job, label in pairsInOrder(result) do
+            jobOptions[#jobOptions + 1] = {
+                title = label,
+                onSelect = function()
+                    TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
+                    if not Config.UseTarget and inRangeCityhall then 
+                        lib.showTextUI('[E] Open Cityhall') 
+                    end
+                end
+            }
+        end
+        lib.registerContext({
+            id = 'cityhall_employment_menu',
+            title = 'Employment',
+            menu = 'cityhall_menu',
+            onExit = function()
+                if not Config.UseTarget and inRangeCityhall then 
+                    lib.showTextUI('[E] Open Cityhall') 
+                end
+            end,
+            options = jobOptions
+        })
+        lib.showContext('cityhall_employment_menu')
+    end)
+end
+
+local function OpenCityhallMenu()
+    local closestCityhall = getClosestHall()
+    lib.registerContext({
+        id = 'cityhall_menu',
+        title = 'City Hall',
+        onExit = function()
+            if not Config.UseTarget and inRangeCityhall then 
+                lib.showTextUI('[E] Open Cityhall') 
+            end
+        end,
+        options = {
+            {
+                title = 'Identity',
+                description = 'Obtain a drivers license or ID card',
+                onSelect = function()
+                    OpenCityhallIdentityMenu(closestCityhall)
+                end
+            },
+            {
+                title = 'Employment',
+                description = 'Select a new job',
+                onSelect = function()
+                    OpenCityhallEmploymentMenu(closestCityhall)
+                end
+            }
+        }
+    })
+    lib.showContext('cityhall_menu')
     if not Config.UseTarget or bool then return end
     inRangeCityhall = false
 end
@@ -129,59 +211,83 @@ local function spawnPeds()
         if Config.UseTarget then
             local opts = nil
             if current.drivingschool then
-                opts = {
-                    label = 'Take Driving Lessons',
+                exports.ox_target:addLocalEntity(ped, {{
+                    name = 'take_driving_test' .. i,
                     icon = 'fa-solid fa-car-side',
-                    action = function()
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest', Config.DrivingSchools[closestDrivingSchool].instructors)
+                    label = 'Take Driving Lessons',
+                    distance = 1.5,
+                    onSelect = function()
+                        TriggerServerEvent('qb-cityhall:server:sendDriverTest')
                     end
-                }
+                }})
             elseif current.cityhall then
-                opts = {
-                    label = 'Open Cityhall',
+                exports.ox_target:addLocalEntity(ped, {{
+                    name = 'open_cityhall' .. i,
                     icon = 'fa-solid fa-city',
-                    action = function()
+                    label = 'Open Cityhall',
+                    distance = 1.5,
+                    debug = true,
+                    onSelect = function()
                         inRangeCityhall = true
-                        setCityhallPageState(true, true)
+                        OpenCityhallMenu()
                     end
-                }
-            end
-            if opts then
-                exports['qb-target']:AddTargetEntity(ped, {
-                    options = {opts},
-                    distance = 2.0
-                })
+                }})
             end
         else
             local options = current.zoneOptions
             if options then
-                local zone = BoxZone:Create(current.coords.xyz, options.length, options.width, {
-                    name = "zone_cityhall_"..ped,
-                    heading = current.coords.w,
-                    debugPoly = false,
-                    minZ = current.coords.z - 3.0,
-                    maxZ = current.coords.z + 2.0
-                })
-                zone:onPlayerInOut(function(inside)
-                    if isLoggedIn and closestCityhall and closestDrivingSchool then
-                        if inside then
-                            if current.drivingschool then
-                                inRangeDrivingSchool = true
-                                exports['qb-core']:DrawText('[E] Take Driving Lessons')
-                            elseif current.cityhall then
-                                inRangeCityhall = true
-                                exports['qb-core']:DrawText('[E] Open Cityhall')
-                            end
-                        else
-                            exports['qb-core']:HideText()
-                            if current.drivingschool then
-                                inRangeDrivingSchool = false
-                            elseif current.cityhall then
-                                inRangeCityhall = false
-                            end
+                local function onEnterZone(zone)
+                    if LocalPlayer.state.isLoggedIn then
+                        if current.drivingschool and zone.name == 'driving_school' then
+                            inRangeDrivingSchool = true
+                            lib.showTextUI('[E] Take Driving Lessons')
+                            CreateThread(function()
+                                while inRangeDrivingSchool do
+                                    Wait(0)
+                                    if IsControlJustPressed(0, 38) then
+                                        TriggerServerEvent('qb-cityhall:server:sendDriverTest')
+                                        Wait(500)
+                                        lib.hideTextUI()
+                                    end
+                                end
+                            end)
+                        elseif current.cityhall and zone.name == 'cityhall' then
+                            inRangeCityhall = true
+                            lib.showTextUI('[E] Open Cityhall')
+                            CreateThread(function()
+                                while inRangeCityhall do
+                                    Wait(0)
+                                    if IsControlJustPressed(0, 38) then
+                                        OpenCityhallMenu()
+                                        Wait(500)
+                                        lib.hideTextUI()
+                                    end
+                                end
+                            end)
                         end
                     end
-                end)
+                end
+                
+                local function onExitZone(zone)
+                    if (zone.name == 'driving_school') or (zone.name == 'cityhall') then
+                        lib.hideTextUI()
+                        if current.drivingschool then
+                            inRangeDrivingSchool = false
+                        elseif current.cityhall then
+                            inRangeCityhall = false
+                        end
+                    end
+                end
+
+                local zone = lib.zones.box({
+                    name = current.drivingschool and 'driving_school' or 'cityhall',
+                    coords = current.coords.xyz,
+                    size = vec3(2, 2, 3),
+                    rotation = current.coords.w,
+                    debug = false,
+                    onEnter = onEnterZone,
+                    onExit = onExitZone
+                })
             end
         end
     end
@@ -202,13 +308,13 @@ end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
-    isLoggedIn = true
+    initBlips()
     spawnPeds()
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerData = {}
-    isLoggedIn = false
+    deleteBlips()
     deletePeds()
 end)
 
@@ -239,97 +345,4 @@ AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
     deleteBlips()
     deletePeds()
-end)
-
--- NUI Callbacks
-
-RegisterNUICallback('close', function(_, cb)
-    setCityhallPageState(false, false)
-    if not Config.UseTarget and inRangeCityhall then exports['qb-core']:DrawText('[E] Open Cityhall') end -- Reopen interaction when you're still inside the zone
-    cb('ok')
-end)
-
-RegisterNUICallback('requestId', function(id, cb)
-    local license = Config.Cityhalls[closestCityhall].licenses[id.type]
-    if inRangeCityhall and license and id.cost == license.cost then
-        TriggerServerEvent('qb-cityhall:server:requestId', id.type, closestCityhall)
-        QBCore.Functions.Notify(('You have received your %s for $%s'):format(license.label, id.cost), 'success', 3500)
-    else
-        QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
-    end
-    cb('ok')
-end)
-
-RegisterNUICallback('requestLicenses', function(_, cb)
-    local licensesMeta = PlayerData.metadata["licences"]
-    local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
-    for license, data in pairs(availableLicenses) do
-        if data.metadata and not licensesMeta[data.metadata] then
-            availableLicenses[license] = nil
-        end
-    end
-    cb(availableLicenses)
-end)
-
-RegisterNUICallback('applyJob', function(job, cb)
-    if inRangeCityhall then
-        TriggerServerEvent('qb-cityhall:server:ApplyJob', job, Config.Cityhalls[closestCityhall].coords)
-    else
-        QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
-    end
-    cb('ok')
-end)
-
--- Threads
-
-CreateThread(function()
-    while true do
-        if isLoggedIn then
-            playerPed = PlayerPedId()
-            playerCoords = GetEntityCoords(playerPed)
-            closestCityhall = getClosestHall()
-            closestDrivingSchool = getClosestSchool()
-        end
-        Wait(1000)
-    end
-end)
-
-CreateThread(function()
-    initBlips()
-    spawnPeds()
-    QBCore.Functions.TriggerCallback('qb-cityhall:server:receiveJobs', function(result)
-        SendNUIMessage({
-            action = 'setJobs',
-            jobs = result
-        })
-    end)
-    if not Config.UseTarget then
-        while true do
-            local sleep = 1000
-            if isLoggedIn and closestCityhall and closestDrivingSchool then
-                if inRangeCityhall then
-                    if not inCityhallPage then
-                        sleep = 0
-                        if IsControlJustPressed(0, 38) then
-                            setCityhallPageState(true, true)
-                            exports['qb-core']:KeyPressed()
-                            Wait(500)
-                            exports['qb-core']:HideText()
-                            sleep = 1000
-                        end
-                    end
-                elseif inRangeDrivingSchool then
-                    sleep = 0
-                    if IsControlJustPressed(0, 38) then
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest', Config.DrivingSchools[closestDrivingSchool].instructors)
-                        sleep = 5000
-                        exports['qb-core']:KeyPressed()
-                        Wait(500)
-                        exports['qb-core']:HideText()
-                    end
-                end
-            end
-            Wait(sleep)
-        end
-    end
 end)
