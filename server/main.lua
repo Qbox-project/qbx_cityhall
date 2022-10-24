@@ -169,12 +169,12 @@ QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", {{"id
     local Player = QBCore.Functions.GetPlayer(source)
     local SearchedPlayer = QBCore.Functions.GetPlayer(tonumber(args[1]))
     if SearchedPlayer then
-        if not SearchedPlayer.PlayerData.metadata["licences"]["driver"] then
+        if not SearchedPlayer.PlayerData.metadata["licenses"]["driver"] then
             for i = 1, #Config.DrivingSchools do
                 for id = 1, #Config.DrivingSchools[i].instructors do
                     if Config.DrivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
-                        SearchedPlayer.PlayerData.metadata["licences"]["driver"] = true
-                        SearchedPlayer.Functions.SetMetaData("licences", SearchedPlayer.PlayerData.metadata["licences"])
+                        SearchedPlayer.PlayerData.metadata["licenses"]["driver"] = true
+                        SearchedPlayer.Functions.SetMetaData("licenses", SearchedPlayer.PlayerData.metadata["licenses"])
                         TriggerClientEvent('ox_lib:notify', source, {
                             title = 'Alert',
                             description = "You have passed! Pick up your drivers license at the town hall",
