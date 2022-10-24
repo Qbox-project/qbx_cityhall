@@ -42,7 +42,7 @@ local function pairsInOrder(object, _)
 end
 
 local function OpenCityhallIdentityMenu(closestCityhall)
-    local licensesMeta = PlayerData.metadata["licences"]
+    local licensesMeta = PlayerData.metadata["licenses"]
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
     for license, data in pairs(availableLicenses) do
         if data.metadata and not licensesMeta[data.metadata] then
