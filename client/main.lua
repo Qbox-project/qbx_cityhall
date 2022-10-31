@@ -56,8 +56,8 @@ local function OpenCityhallIdentityMenu(closestCityhall)
             description = ('Price: $%s'):format(id.cost),
             onSelect = function()
                 TriggerServerEvent('qb-cityhall:server:requestId', item, closestCityhall)
-                if not Config.UseTarget and inRangeCityhall then 
-                    lib.showTextUI('[E] Open Cityhall') 
+                if not Config.UseTarget and inRangeCityhall then
+                    lib.showTextUI('[E] Open Cityhall')
                 end
             end
         }
@@ -67,8 +67,8 @@ local function OpenCityhallIdentityMenu(closestCityhall)
         title = 'Identity',
         menu = 'cityhall_menu',
         onExit = function()
-            if not Config.UseTarget and inRangeCityhall then 
-                lib.showTextUI('[E] Open Cityhall') 
+            if not Config.UseTarget and inRangeCityhall then
+                lib.showTextUI('[E] Open Cityhall')
             end
         end,
         options = identityOptions
@@ -84,8 +84,8 @@ local function OpenCityhallEmploymentMenu(closestCityhall)
                 title = label,
                 onSelect = function()
                     TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
-                    if not Config.UseTarget and inRangeCityhall then 
-                        lib.showTextUI('[E] Open Cityhall') 
+                    if not Config.UseTarget and inRangeCityhall then
+                        lib.showTextUI('[E] Open Cityhall')
                     end
                 end
             }
@@ -95,8 +95,8 @@ local function OpenCityhallEmploymentMenu(closestCityhall)
             title = 'Employment',
             menu = 'cityhall_menu',
             onExit = function()
-                if not Config.UseTarget and inRangeCityhall then 
-                    lib.showTextUI('[E] Open Cityhall') 
+                if not Config.UseTarget and inRangeCityhall then
+                    lib.showTextUI('[E] Open Cityhall')
                 end
             end,
             options = jobOptions
@@ -111,8 +111,8 @@ local function OpenCityhallMenu()
         id = 'cityhall_menu',
         title = 'City Hall',
         onExit = function()
-            if not Config.UseTarget and inRangeCityhall then 
-                lib.showTextUI('[E] Open Cityhall') 
+            if not Config.UseTarget and inRangeCityhall then
+                lib.showTextUI('[E] Open Cityhall')
             end
         end,
         options = {
@@ -166,7 +166,7 @@ local function initBlips()
     for i = 1, #Config.Cityhalls do
         local hall = Config.Cityhalls[i]
         if hall.showBlip then
-            blips[#blips+1] = createBlip({
+            blips[#blips + 1] = createBlip({
                 coords = hall.coords,
                 sprite = hall.blipData.sprite,
                 display = hall.blipData.display,
@@ -180,7 +180,7 @@ local function initBlips()
     for i = 1, #Config.DrivingSchools do
         local school = Config.DrivingSchools[i]
         if school.showBlip then
-            blips[#blips+1] = createBlip({
+            blips[#blips + 1] = createBlip({
                 coords = school.coords,
                 sprite = school.blipData.sprite,
                 display = school.blipData.display,
@@ -211,7 +211,7 @@ local function spawnPeds()
         if Config.UseTarget then
             local opts = nil
             if current.drivingschool then
-                exports.ox_target:addLocalEntity(ped, {{
+                exports.ox_target:addLocalEntity(ped, { {
                     name = 'take_driving_test' .. i,
                     icon = 'fa-solid fa-car-side',
                     label = 'Take Driving Lessons',
@@ -219,9 +219,9 @@ local function spawnPeds()
                     onSelect = function()
                         TriggerServerEvent('qb-cityhall:server:sendDriverTest')
                     end
-                }})
+                } })
             elseif current.cityhall then
-                exports.ox_target:addLocalEntity(ped, {{
+                exports.ox_target:addLocalEntity(ped, { {
                     name = 'open_cityhall' .. i,
                     icon = 'fa-solid fa-city',
                     label = 'Open Cityhall',
@@ -231,7 +231,7 @@ local function spawnPeds()
                         inRangeCityhall = true
                         OpenCityhallMenu()
                     end
-                }})
+                } })
             end
         else
             local options = current.zoneOptions
@@ -267,7 +267,7 @@ local function spawnPeds()
                         end
                     end
                 end
-                
+
                 local function onExitZone(zone)
                     if (zone.name == 'driving_school') or (zone.name == 'cityhall') then
                         lib.hideTextUI()
@@ -335,7 +335,7 @@ RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
         TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Lang:t('email.sender'),
             subject = Lang:t('email.subject'),
-            message =  Lang:t('email.message', {gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone}),
+            message = Lang:t('email.message', { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
             button = {}
         })
     end)
