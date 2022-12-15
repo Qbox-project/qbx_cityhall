@@ -142,7 +142,7 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
         return DropPlayer(source, "Attempted exploit abuse")
     end
     Player.Functions.SetJob(job, 0)
-    TriggerClientEvent('ox_lib:notify', source, { description = Lang:t('info.new_job'), type = 'success' })
+    TriggerClientEvent('ox_lib:notify', source, { description = Lang:t('info.new_job', {job = JobInfo.label}), type = 'success' })
 end)
 
 RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
