@@ -158,7 +158,7 @@ lib.addCommand('drivinglicense', {
     if not args.id then return TriggerClientEvent('ox_lib:notify', source, { description = "Player Not Online", type = 'error' }) end
 
     local Player = QBCore.Functions.GetPlayer(source)
-    local SearchedPlayer = QBCore.Functions.GetPlayer(tonumber(args.id))
+    local SearchedPlayer = QBCore.Functions.GetPlayer(args.id)
     if SearchedPlayer then
         if not SearchedPlayer.PlayerData.metadata["licences"]["driver"] then
             for i = 1, #Config.DrivingSchools do
