@@ -149,7 +149,7 @@ RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
 
 -- Commands
 
-lib.addCommand('tp', {
+lib.addCommand('drivinglicense', {
     help = 'Give a drivers license to someone',
     params = {
         { name = 'id', help = "ID of a person", type = 'PlayerId'},
