@@ -152,7 +152,7 @@ RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
 lib.addCommand('drivinglicense', {
     help = 'Give a drivers license to someone',
     params = {
-        { name = 'id', help = "ID of a person", type = 'PlayerId'},
+        { name = 'id', help = "ID of a person", type = 'PlayerId' },
     }
 }, function(source, args)
     if not args.id then return TriggerClientEvent('ox_lib:notify', source, { description = "Player Not Online", type = 'error' }) end
