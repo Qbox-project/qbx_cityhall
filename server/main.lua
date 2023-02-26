@@ -149,9 +149,16 @@ RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
 
 -- Commands
 
-QBCore.Commands.Add("drivinglicense", "Give a drivers license to someone", {{"id", "ID of a person"}}, true, function(source, args)
+lib.addCommand('drivinglicense', {
+    help = 'Give a drivers license to someone',
+    params = {
+        { name = 'id', help = "ID of a person", type = 'PlayerId' },
+    }
+}, function(source, args)
+    if not args.id then return TriggerClientEvent('ox_lib:notify', source, { description = "Player Not Online", type = 'error' }) end
+
     local Player = QBCore.Functions.GetPlayer(source)
-    local SearchedPlayer = QBCore.Functions.GetPlayer(tonumber(args[1]))
+    local SearchedPlayer = QBCore.Functions.GetPlayer(args.id)
     if SearchedPlayer then
         if not SearchedPlayer.PlayerData.metadata["licences"]["driver"] then
             for i = 1, #Config.DrivingSchools do
