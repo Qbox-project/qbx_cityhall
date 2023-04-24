@@ -11,26 +11,53 @@ local availableJobs = {
 }
 
 -- Functions
+local function genderString(sexString)
+    if not sexString == 1 then sexString = 'Female' else  sexString = 'Male' end return sexString
+end
 
 local function giveStarterItems()
     local Player = QBCore.Functions.GetPlayer(source)
     if not Player then return end
     for _, v in pairs(QBCore.Shared.StarterItems) do
-        local info = {}
-        if v.item == "id_card" then
-            info.citizenid = Player.PlayerData.citizenid
-            info.firstname = Player.PlayerData.charinfo.firstname
-            info.lastname = Player.PlayerData.charinfo.lastname
-            info.birthdate = Player.PlayerData.charinfo.birthdate
-            info.gender = Player.PlayerData.charinfo.gender
-            info.nationality = Player.PlayerData.charinfo.nationality
-        elseif v.item == "driver_license" then
-            info.firstname = Player.PlayerData.charinfo.firstname
-            info.lastname = Player.PlayerData.charinfo.lastname
-            info.birthdate = Player.PlayerData.charinfo.birthdate
-            info.type = "Class C Driver License"
+        if v.item == 'id_card' then
+            local metadata = {
+                type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
+                description = string.format('CID: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+                citizenid = Player.PlayerData.citizenid,
+                firstname = Player.PlayerData.charinfo.firstname,
+                lastname = Player.PlayerData.charinfo.lastname,
+                gender = genderString(Player.PlayerData.charinfo.gender),
+                birthdate = Player.PlayerData.charinfo.birthdate,
+                nationality = Player.PlayerData.charinfo.nationality,
+            }
+            exports.ox_inventory:AddItem(source, v.item, v.amount, metadata)
+        elseif v.item == 'driver_license' then
+            local metadata = {
+                type = 'Class C Driver License',
+                description = string.format('CID: %s  \nFirst Name: %s  \nLast Name: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate ,genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+                citizenid = Player.PlayerData.citizenid,
+                firstname = Player.PlayerData.charinfo.firstname,
+                lastname = Player.PlayerData.charinfo.lastname,
+                gender = genderString(Player.PlayerData.charinfo.gender),
+                birthdate = Player.PlayerData.charinfo.birthdate,
+                nationality = Player.PlayerData.charinfo.nationality,
+            }
+            exports.ox_inventory:AddItem(source, v.item, v.amount, metadata)
+        elseif v.item == "weaponlicense" then
+            local metadata = {
+                type = 'Weapon License',
+                description = string.format('CID: %s  \nFirst Name: %s  \nLast Name: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate ,genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+                citizenid = Player.PlayerData.citizenid,
+                firstname = Player.PlayerData.charinfo.firstname,
+                lastname = Player.PlayerData.charinfo.lastname,
+                gender = genderString(Player.PlayerData.charinfo.gender),
+                birthdate = Player.PlayerData.charinfo.birthdate,
+                nationality = Player.PlayerData.charinfo.nationality,
+            }
+            exports.ox_inventory:AddItem(source, v.item, v.amount, metadata)
+        else
+            exports.ox_inventory:AddItem(source, v.item, v.amount)
         end
-        Player.Functions.AddItem(v.item, 1, nil, info)
     end
 end
 
@@ -78,28 +105,44 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then 
         return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), type = 'error' })
     end
-    local info = {}
+    local metadata = {}
     if item == "id_card" then
-        info.citizenid = Player.PlayerData.citizenid
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
-        info.gender = Player.PlayerData.charinfo.gender
-        info.nationality = Player.PlayerData.charinfo.nationality
+        metadata = {
+            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
+            description = string.format('CID: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+            citizenid = Player.PlayerData.citizenid,
+            firstname = Player.PlayerData.charinfo.firstname,
+            lastname = Player.PlayerData.charinfo.lastname,
+            gender = genderString(Player.PlayerData.charinfo.gender),
+            birthdate = Player.PlayerData.charinfo.birthdate,
+            nationality = Player.PlayerData.charinfo.nationality,
+        }
     elseif item == "driver_license" then
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
-        info.type = "Class C Driver License"
+        metadata = {
+            type = 'Class C Driver License',
+            description = string.format('CID: %s  \nFirst Name: %s  \nLast Name: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate ,genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+            citizenid = Player.PlayerData.citizenid,
+            firstname = Player.PlayerData.charinfo.firstname,
+            lastname = Player.PlayerData.charinfo.lastname,
+            gender = genderString(Player.PlayerData.charinfo.gender),
+            birthdate = Player.PlayerData.charinfo.birthdate,
+            nationality = Player.PlayerData.charinfo.nationality,
+        }
     elseif item == "weaponlicense" then
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
+        metadata = {
+            type = 'Weapon License',
+            description = string.format('CID: %s  \nFirst Name: %s  \nLast Name: %s  \nDOB: %s  \nGender: %s  \nNationality: %s ', Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate ,genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.nationality),
+            citizenid = Player.PlayerData.citizenid,
+            firstname = Player.PlayerData.charinfo.firstname,
+            lastname = Player.PlayerData.charinfo.lastname,
+            gender = genderString(Player.PlayerData.charinfo.gender),
+            birthdate = Player.PlayerData.charinfo.birthdate,
+            nationality = Player.PlayerData.charinfo.nationality,
+        }
     else
         return DropPlayer(src, 'Attempted exploit abuse')
     end
-    if not Player.Functions.AddItem(item, 1, nil, info) then return end
-    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
+    if not exports.ox_inventory:AddItem(src, item, 1, metadata) then return end
     TriggerClientEvent('ox_lib:notify', src, { description = ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost), type = 'success' })
 end)
 
