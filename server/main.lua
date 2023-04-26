@@ -11,14 +11,20 @@ local availableJobs = {
 }
 
 -- Functions
-local function genderString(sexString)
-    if not sexString == 1 then sexString = 'Female' else  sexString = 'Male' end return sexString
-end
-
 local function giveStarterItems()
     local Player = QBCore.Functions.GetPlayer(source)
     if not Player then return end
-    local citizenid, firstname, lastname, gender, birthdate, nationality = Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.nationality
+    local citizenid = Player.PlayerData.citizenid
+    local firstname = Player.PlayerData.charinfo.firstname
+    local lastname = Player.PlayerData.charinfo.lastname
+    local gender = 'Male'
+    local birthdate = Player.PlayerData.charinfo.birthdate
+    local nationality  = Player.PlayerData.charinfo.nationality
+    if not Player.PlayerData.charinfo.gender == 1 then
+        gender = 'Female'
+    else
+        gender = 'Male'
+    end
     for _, v in pairs(QBCore.Shared.StarterItems) do
         if v.item == 'id_card' then
             local metadata = {
@@ -102,9 +108,18 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
-    local itemInfo = Config.Cityhalls[hall].licenses[item]
-    local citizenid, firstname, lastname, gender, birthdate, nationality = Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, genderString(Player.PlayerData.charinfo.gender), Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.nationality
-    if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then 
+    local citizenid = Player.PlayerData.citizenid
+    local firstname = Player.PlayerData.charinfo.firstname
+    local lastname = Player.PlayerData.charinfo.lastname
+    local gender = 'Male'
+    local birthdate = Player.PlayerData.charinfo.birthdate
+    local nationality  = Player.PlayerData.charinfo.nationality
+    if not Player.PlayerData.charinfo.gender == 1 then
+        gender = 'Female'
+    else
+        gender = 'Male'
+    end
+    if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), type = 'error' })
     end
     local metadata = {}
