@@ -17,14 +17,9 @@ local function giveStarterItems()
     local citizenid = Player.PlayerData.citizenid
     local firstname = Player.PlayerData.charinfo.firstname
     local lastname = Player.PlayerData.charinfo.lastname
-    local gender = 'Male'
+    local gender = Player.PlayerData.charinfo.gender == 1 and 'Male' or 'Female'
     local birthdate = Player.PlayerData.charinfo.birthdate
     local nationality  = Player.PlayerData.charinfo.nationality
-    if not Player.PlayerData.charinfo.gender == 1 then
-        gender = 'Female'
-    else
-        gender = 'Male'
-    end
     for _, v in pairs(QBCore.Shared.StarterItems) do
         if v.item == 'id_card' then
             local metadata = {
@@ -111,14 +106,9 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     local citizenid = Player.PlayerData.citizenid
     local firstname = Player.PlayerData.charinfo.firstname
     local lastname = Player.PlayerData.charinfo.lastname
-    local gender = 'Male'
+    local gender = Player.PlayerData.charinfo.gender == 1 and 'Male' or 'Female'
     local birthdate = Player.PlayerData.charinfo.birthdate
     local nationality  = Player.PlayerData.charinfo.nationality
-    if not Player.PlayerData.charinfo.gender == 1 then
-        gender = 'Female'
-    else
-        gender = 'Male'
-    end
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), type = 'error' })
     end
