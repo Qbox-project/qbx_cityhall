@@ -78,27 +78,29 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then 
         return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), type = 'error' })
     end
-    local info = {}
+    local metadata = {}
     if item == "id_card" then
-        info.citizenid = Player.PlayerData.citizenid
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
-        info.gender = Player.PlayerData.charinfo.gender
-        info.nationality = Player.PlayerData.charinfo.nationality
+        metadata = {
+            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
+            description = string.format('CID: %s  \nBirth date: %s  \nSex: %s  \nNationality: %s',
+            Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.gender == 0 and 'Male' or 'Female', Player.PlayerData.charinfo.nationality)
+        }
     elseif item == "driver_license" then
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
-        info.type = "Class C Driver License"
+        metadata = {
+            type = 'Class C Driver License',
+            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
+            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
+        }
     elseif item == "weaponlicense" then
-        info.firstname = Player.PlayerData.charinfo.firstname
-        info.lastname = Player.PlayerData.charinfo.lastname
-        info.birthdate = Player.PlayerData.charinfo.birthdate
+        metadata = {
+            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
+            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
+            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
+        }
     else
         return DropPlayer(src, 'Attempted exploit abuse')
     end
-    if not Player.Functions.AddItem(item, 1, nil, info) then return end
+    if not Player.Functions.AddItem(item, 1, nil, metadata) then return end
     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
     TriggerClientEvent('ox_lib:notify', src, { description = ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost), type = 'success' })
 end)
