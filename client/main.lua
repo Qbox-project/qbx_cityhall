@@ -44,8 +44,8 @@ end
 local function OpenCityhallIdentityMenu(closestCityhall)
     local licensesMeta = PlayerData.metadata["licences"]
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
-    for license, data in pairs(availableLicenses) do
-        if data.metadata and not licensesMeta[data.metadata] then
+    for license in pairs(availableLicenses) do
+        if license and not licensesMeta[license] then
             availableLicenses[license] = nil
         end
     end
