@@ -7,7 +7,6 @@ local availableJobs = {
     ["reporter"] = "News Reporter",
     ["garbage"] = "Garbage Collector",
     ["bus"] = "Bus Driver",
-    ["hotdog"] = "Hot Dog Stand"
 }
 
 -- Functions
@@ -76,7 +75,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player then return end
     local itemInfo = Config.Cityhalls[hall].licenses[item]
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then 
-        return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), type = 'error' })
+        return TriggerClientEvent('QBCore:Notify', src, ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), 'error')
     end
     local metadata = {}
     if item == "id_card" then
@@ -102,7 +101,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     end
     if not Player.Functions.AddItem(item, 1, nil, metadata) then return end
     TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
-    TriggerClientEvent('ox_lib:notify', src, { description = ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost), type = 'success' })
+    TriggerClientEvent('QBCore:Notify', src, ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
@@ -128,7 +127,7 @@ RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
             TriggerEvent("qb-phone:server:sendNewMailToOffline", citizenid, mailData)
         end
     end
-    TriggerClientEvent('ox_lib:notify', source, { description = "An email has been sent to driving schools, and you will be contacted automatically", type = 'success' })
+    TriggerClientEvent('QBCore:Notify', source, "An email has been sent to driving schools, and you will be contacted automatically", 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
@@ -144,7 +143,7 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
         return DropPlayer(source, "Attempted exploit abuse")
     end
     Player.Functions.SetJob(job, 0)
-    TriggerClientEvent('ox_lib:notify', source, { description = Lang:t('info.new_job', {job = JobInfo.label}), type = 'success' })
+    TriggerClientEvent('QBCore:Notify', source, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
