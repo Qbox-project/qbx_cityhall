@@ -78,19 +78,19 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
         return TriggerClientEvent('QBCore:Notify', src, ('You don\'t have enough money on you, you need $%s cash'):format(itemInfo.cost), 'error')
     end
     local metadata = {}
-    if item == "id_card" then
+    if item.item == "id_card" then
         metadata = {
             type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
             description = string.format('CID: %s  \nBirth date: %s  \nSex: %s  \nNationality: %s',
             Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.gender == 0 and 'Male' or 'Female', Player.PlayerData.charinfo.nationality)
         }
-    elseif item == "driver_license" then
+    elseif item.item == "driver_license" then
         metadata = {
             type = 'Class C Driver License',
             description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
             Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
         }
-    elseif item == "weaponlicense" then
+    elseif item.item == "weaponlicense" then
         metadata = {
             type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
             description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
