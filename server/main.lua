@@ -99,9 +99,8 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     else
         return DropPlayer(src, 'Attempted exploit abuse')
     end
-    if not Player.Functions.AddItem(item, 1, nil, metadata) then return end
-    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
-    TriggerClientEvent('QBCore:Notify', src, ('You have received your %s for $%s'):format(QBCore.Shared.Items[item].label, itemInfo.cost), 'success')
+    if not Player.Functions.AddItem(itemInfo.item, 1, nil, metadata) then return end
+    TriggerClientEvent('QBCore:Notify', src, ('You have received your %s for $%s'):format(QBCore.Shared.Items[itemInfo.item].label, itemInfo.cost), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
