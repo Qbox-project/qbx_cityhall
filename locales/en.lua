@@ -4,12 +4,12 @@ local Translations = {
         not_enough_money = 'You don\'t have enough money on you, you need %s cash',
         exploit_attempt = 'Attempted exploit abuse',
         player_not_online = "Player Not Online",
-        already_earned_license = 'This person has already earned their %{type} license'
+        already_earned_license = 'This person has already earned this license'
     },
     success = {
         recived_license = 'You have recived your %{value} for $50',
-        you_have_passed = "You have passed! Pick up your %{type} license at the town hall",
-        license_granted = 'Player with ID %{id} has been granted access to a %{type} license'
+        you_have_passed = "You have passed! Pick up your license at the town hall",
+        license_granted = 'Player with ID %{id} has been granted access to a license'
     },
     info = {
         bilp_text = 'City Services',
