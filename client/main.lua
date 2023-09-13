@@ -1,6 +1,6 @@
-local QBCore = exports['qbx-core']:GetCoreObject()
-local PlayerData = QBCore.Functions.GetPlayerData()
-local inRangeCityhall, inRangeDrivingSchool = false, false
+local PlayerData = nil
+local inRangeCityhall = false
+local inRangeDrivingSchool = false
 local pedsSpawned = false
 local table_clone = table.clone
 local blips = {}
@@ -8,7 +8,7 @@ local blips = {}
 -- Functions
 
 local function getClosestHall()
-    local playerPed = PlayerPedId()
+    local playerPed = cache.ped
     local playerCoords = GetEntityCoords(playerPed)
     local distance = #(playerCoords - Config.Cityhalls[1].coords)
     local closest = 1
@@ -42,7 +42,7 @@ local function pairsInOrder(object, _)
 end
 
 local function OpenCityhallIdentityMenu(closestCityhall)
-    local licensesMeta = PlayerData.metadata["licences"]
+    local licensesMeta = PlayerData.metadata.licences
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
     for license in pairs(availableLicenses) do
         if license and not licensesMeta[license] then
@@ -53,22 +53,22 @@ local function OpenCityhallIdentityMenu(closestCityhall)
     for item, id in pairsInOrder(availableLicenses) do
         identityOptions[#identityOptions + 1] = {
             title = id.label,
-            description = ('Price: $%s'):format(id.cost),
+            description = Lang:t('info.price', {cost = id.cost}),
             onSelect = function()
                 TriggerServerEvent('qb-cityhall:server:requestId', item, closestCityhall)
                 if not Config.UseTarget and inRangeCityhall then
-                    lib.showTextUI('[E] Open Cityhall')
+                    lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
             end
         }
     end
     lib.registerContext({
         id = 'cityhall_identity_menu',
-        title = 'Identity',
+        title = Lang:t('info.identity'),
         menu = 'cityhall_menu',
         onExit = function()
             if not Config.UseTarget and inRangeCityhall then
-                lib.showTextUI('[E] Open Cityhall')
+                lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
         options = identityOptions
@@ -85,18 +85,18 @@ local function OpenCityhallEmploymentMenu(closestCityhall)
                 onSelect = function()
                     TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
                     if not Config.UseTarget and inRangeCityhall then
-                        lib.showTextUI('[E] Open Cityhall')
+                        lib.showTextUI(Lang:t('info.open_cityhall'))
                     end
                 end
             }
         end
         lib.registerContext({
             id = 'cityhall_employment_menu',
-            title = 'Employment',
+            title = Lang:t('info.employment'),
             menu = 'cityhall_menu',
             onExit = function()
                 if not Config.UseTarget and inRangeCityhall then
-                    lib.showTextUI('[E] Open Cityhall')
+                    lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
             end,
             options = jobOptions
@@ -109,23 +109,23 @@ local function OpenCityhallMenu()
     local closestCityhall = getClosestHall()
     lib.registerContext({
         id = 'cityhall_menu',
-        title = 'City Hall',
+        title = Lang:t('info.city_hall'),
         onExit = function()
             if not Config.UseTarget and inRangeCityhall then
-                lib.showTextUI('[E] Open Cityhall')
+                lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
         options = {
             {
-                title = 'Identity',
-                description = 'Obtain a drivers license or ID card',
+                title = Lang:t('info.identity'),
+                description = Lang:t('info.obtain_license_identity'),
                 onSelect = function()
                     OpenCityhallIdentityMenu(closestCityhall)
                 end
             },
             {
-                title = 'Employment',
-                description = 'Select a new job',
+                title = Lang:t('info.employment'),
+                description = Lang:t('info.select_job'),
                 onSelect = function()
                     OpenCityhallEmploymentMenu(closestCityhall)
                 end
@@ -214,7 +214,7 @@ local function spawnPeds()
                 exports.ox_target:addLocalEntity(ped, { {
                     name = 'take_driving_test' .. i,
                     icon = 'fa-solid fa-car-side',
-                    label = 'Take Driving Lessons',
+                    label = Lang:t('info.take_lessons'),
                     distance = 1.5,
                     onSelect = function()
                         TriggerServerEvent('qb-cityhall:server:sendDriverTest')
@@ -224,7 +224,7 @@ local function spawnPeds()
                 exports.ox_target:addLocalEntity(ped, { {
                     name = 'open_cityhall' .. i,
                     icon = 'fa-solid fa-city',
-                    label = 'Open Cityhall',
+                    label = Lang:t('info.target_open_cityhall'),
                     distance = 1.5,
                     debug = true,
                     onSelect = function()
@@ -240,7 +240,7 @@ local function spawnPeds()
                     if LocalPlayer.state.isLoggedIn then
                         if current.drivingschool and zone.name == 'driving_school' then
                             inRangeDrivingSchool = true
-                            lib.showTextUI('[E] Take Driving Lessons')
+                            lib.showTextUI(Lang:t('info.e_take_lessons'))
                             CreateThread(function()
                                 while inRangeDrivingSchool do
                                     Wait(0)
@@ -253,7 +253,7 @@ local function spawnPeds()
                             end)
                         elseif current.cityhall and zone.name == 'cityhall' then
                             inRangeCityhall = true
-                            lib.showTextUI('[E] Open Cityhall')
+                            lib.showTextUI(Lang:t('info.open_cityhall'))
                             CreateThread(function()
                                 while inRangeCityhall do
                                     Wait(0)
@@ -308,6 +308,7 @@ end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
+    if not PlayerData then return end
     initBlips()
     spawnPeds()
 end)
@@ -328,14 +329,10 @@ end)
 
 RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
     SetTimeout(math.random(2500, 4000), function()
-        local gender = Lang:t('email.mr')
-        if PlayerData.charinfo.gender == 1 then
-            gender = Lang:t('email.mrs')
-        end
         TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Lang:t('email.sender'),
             subject = Lang:t('email.subject'),
-            message = Lang:t('email.message', { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
+            message = Lang:t('email.message', {firstname = charinfo.firstname, lastname = charinfo.lastname, phone = charinfo.phone}),
             button = {}
         })
     end)
