@@ -1,7 +1,7 @@
 local Translations = {
     error = {
         not_in_range = 'Muy lejos de la municipalidad',
-        not_enough_money = 'No tienes suficiente efectivo contigo, necesitas $%s',
+        not_enough_money = 'No tienes suficiente efectivo contigo, necesitas $%{cost}',
         exploit_attempt = 'Intento de abuso de sistema',
         player_not_online = 'El jugador no está en línea',
         already_earned_license = 'Esta persona ya tiene ese tipo de licencia'

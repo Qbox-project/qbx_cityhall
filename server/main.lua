@@ -10,28 +10,6 @@ local availableJobs = {
 
 -- Functions
 
-local function giveStarterItems()
-    local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return end
-    for _, v in pairs(QBCore.Shared.StarterItems) do
-        local info = {}
-        if v.item == "id_card" then
-            info.citizenid = Player.PlayerData.citizenid
-            info.firstname = Player.PlayerData.charinfo.firstname
-            info.lastname = Player.PlayerData.charinfo.lastname
-            info.birthdate = Player.PlayerData.charinfo.birthdate
-            info.gender = Player.PlayerData.charinfo.gender
-            info.nationality = Player.PlayerData.charinfo.nationality
-        elseif v.item == "driver_license" then
-            info.firstname = Player.PlayerData.charinfo.firstname
-            info.lastname = Player.PlayerData.charinfo.lastname
-            info.birthdate = Player.PlayerData.charinfo.birthdate
-            info.type = "Class C Driver License"
-        end
-        Player.Functions.AddItem(v.item, 1, nil, info)
-    end
-end
-
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - Config.Cityhalls[1].coords)
     local closest = 1
@@ -76,29 +54,17 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
     end
-    local metadata = {}
-    if itemInfo.item == "id_card" then
-        metadata = {
-            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
-            description = string.format('CID: %s  \nBirth date: %s  \nSex: %s  \nNationality: %s',
-            Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.gender == 0 and 'Male' or 'Female', Player.PlayerData.charinfo.nationality)
-        }
-    elseif itemInfo.item == "driver_license" then
-        metadata = {
-            type = 'Class C Driver License',
-            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
-            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
-        }
-    elseif itemInfo.item == "weaponlicense" then
-        metadata = {
-            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
-            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
-            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
-        }
+    if itemInfo.itemName == "id_card" then
+        exports['um-idcard']:CreateMetaLicense(src, {'id_card'})
+    elseif itemInfo.itemName == "driver_license" then
+        exports['um-idcard']:CreateMetaLicense(src, {'driver_license'})
+    elseif itemInfo.itemName == "weaponlicense" then
+        exports['um-idcard']:CreateMetaLicense(src, {'weaponlicense'})
     else
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.item_received', {label = QBCore.Shared.Items[item].label, cost = itemInfo.cost}), 'success')
+    local licenseItem = exports.ox_inventory:GetItem(src, itemInfo.itemName, nil, false)
+    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.item_received', {label = licenseItem.label, cost = itemInfo.cost}), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
@@ -143,8 +109,6 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
 
-RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
-
 -- Commands
 
 lib.addCommand('drivinglicense', {
@@ -155,16 +119,16 @@ lib.addCommand('drivinglicense', {
 }, function(source, args)
     if not args.id then return TriggerClientEvent('QBCore:Notify', source, Lang:t('error.player_not_online'), 'error') end
 
-    local Player = QBCore.Functions.GetPlayer(source)
-    local SearchedPlayer = QBCore.Functions.GetPlayer(tonumber(args.id))
-    if SearchedPlayer then
-        if not SearchedPlayer.PlayerData.metadata["licences"]["driver"] then
+    local player = QBCore.Functions.GetPlayer(source)
+    local targetPlayer = QBCore.Functions.GetPlayer(tonumber(args.id))
+    if targetPlayer then
+        if not targetPlayer.PlayerData.metadata.licences.driver then
             for i = 1, #Config.DrivingSchools do
                 for id = 1, #Config.DrivingSchools[i].instructors do
-                    if Config.DrivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
-                        SearchedPlayer.PlayerData.metadata["licences"]["driver"] = true
-                        SearchedPlayer.Functions.SetMetaData("licences", SearchedPlayer.PlayerData.metadata["licences"])
-                        TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, Lang:t('success.you_have_passed'), 'success')
+                    if Config.DrivingSchools[i].instructors[id] == player.PlayerData.citizenid then
+                        targetPlayer.PlayerData.metadata.licences.driver = true
+                        targetPlayer.Functions.SetMetaData("licences", targetPlayer.PlayerData.metadata.licences)
+                        TriggerClientEvent('QBCore:Notify', targetPlayer.PlayerData.source, Lang:t('success.you_have_passed'), 'success')
                         TriggerClientEvent('QBCore:Notify', source, Lang:t('success.license_granted'), 'success')
                         break
                     end
