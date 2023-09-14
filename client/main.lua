@@ -1,4 +1,3 @@
-local PlayerData = nil
 local inRangeCityhall = false
 local inRangeDrivingSchool = false
 local pedsSpawned = false
@@ -307,20 +306,13 @@ end
 -- Events
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData = QBCore.Functions.GetPlayerData()
-    if not PlayerData then return end
     initBlips()
     spawnPeds()
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    PlayerData = {}
     deleteBlips()
     deletePeds()
-end)
-
-RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
-    PlayerData = val
 end)
 
 RegisterNetEvent('qb-cityhall:client:getIds', function()

@@ -7,6 +7,7 @@ version '3.0.0'
 modules {
     'qbx-core:utils',
     'qbx-core:core',
+    'qbx-core:playerdata',
 }
 
 shared_scripts {
