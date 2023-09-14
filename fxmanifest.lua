@@ -4,12 +4,19 @@ game 'gta5'
 description 'QB-CityHall'
 version '3.0.0'
 
+modules {
+    'qbx-core:utils',
+    'qbx-core:core',
+    'qbx-core:playerdata',
+}
+
 shared_scripts {
     '@qb-core/shared/locale.lua',
     '@ox_lib/init.lua',
     'locales/en.lua',
     'locales/*.lua',
-    'config.lua'
+    'config.lua',
+    '@qb-core/import.lua',
 }
 
 server_script 'server/main.lua'
