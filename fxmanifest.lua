@@ -11,12 +11,12 @@ modules {
 }
 
 shared_scripts {
-    '@qb-core/shared/locale.lua',
+    '@qbx-core/shared/locale.lua',
     '@ox_lib/init.lua',
     'locales/en.lua',
     'locales/*.lua',
     'config.lua',
-    '@qb-core/import.lua',
+    '@qbx-core/import.lua',
 }
 
 server_script 'server/main.lua'
