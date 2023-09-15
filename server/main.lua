@@ -119,7 +119,7 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
 
-RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
+RegisterNetEvent('qbx-core:server:createCharacter', giveStarterItems)
 
 -- Commands
 
