@@ -315,10 +315,6 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deletePeds()
 end)
 
-RegisterNetEvent('qb-cityhall:client:getIds', function()
-    TriggerServerEvent('qb-cityhall:server:getIDs')
-end)
-
 RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
     SetTimeout(math.random(2500, 4000), function()
         TriggerServerEvent('qb-phone:server:sendNewMail', {
