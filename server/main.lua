@@ -10,7 +10,6 @@ local availableJobs = {
 
 -- Functions
 
-
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - Config.Cityhalls[1].coords)
     local closest = 1
@@ -109,8 +108,6 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     Player.Functions.SetJob(job, 0)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
-
-
 
 -- Commands
 
