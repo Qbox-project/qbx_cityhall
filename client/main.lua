@@ -25,7 +25,7 @@ end
 local function pairsInOrder(object, _)
     local a = {}
     for n in pairs(object) do
-        table.insert(a, n)
+        a[#a +1] = n
     end
     table.sort(a, _)
     local i = 0
@@ -40,7 +40,7 @@ local function pairsInOrder(object, _)
     return iterator
 end
 
-local function OpenCityhallIdentityMenu(closestCityhall)
+local function openCityhallIdentityMenu(closestCityhall)
     local licensesMeta = PlayerData.metadata.licences
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
     for license in pairs(availableLicenses) do
@@ -75,7 +75,7 @@ local function OpenCityhallIdentityMenu(closestCityhall)
     lib.showContext('cityhall_identity_menu')
 end
 
-local function OpenCityhallEmploymentMenu(closestCityhall)
+local function openCityhallEmploymentMenu(closestCityhall)
     lib.callback('qb-cityhall:server:receiveJobs', false, function(result)
         local jobOptions = {}
         for job, label in pairsInOrder(result) do
@@ -104,7 +104,7 @@ local function OpenCityhallEmploymentMenu(closestCityhall)
     end)
 end
 
-local function OpenCityhallMenu()
+local function openCityhallMenu()
     local closestCityhall = getClosestHall()
     lib.registerContext({
         id = 'cityhall_menu',
@@ -119,14 +119,14 @@ local function OpenCityhallMenu()
                 title = Lang:t('info.identity'),
                 description = Lang:t('info.obtain_license_identity'),
                 onSelect = function()
-                    OpenCityhallIdentityMenu(closestCityhall)
+                    openCityhallIdentityMenu(closestCityhall)
                 end
             },
             {
                 title = Lang:t('info.employment'),
                 description = Lang:t('info.select_job'),
                 onSelect = function()
-                    OpenCityhallEmploymentMenu(closestCityhall)
+                    openCityhallEmploymentMenu(closestCityhall)
                 end
             }
         }
@@ -197,10 +197,7 @@ local function spawnPeds()
     for i = 1, #Config.Peds do
         local current = Config.Peds[i]
         current.model = type(current.model) == 'string' and joaat(current.model) or current.model
-        RequestModel(current.model)
-        while not HasModelLoaded(current.model) do
-            Wait(0)
-        end
+        lib.requestModel(current.model)
         local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
@@ -228,7 +225,7 @@ local function spawnPeds()
                     debug = true,
                     onSelect = function()
                         inRangeCityhall = true
-                        OpenCityhallMenu()
+                        openCityhallMenu()
                     end
                 } })
             end
@@ -257,7 +254,7 @@ local function spawnPeds()
                                 while inRangeCityhall do
                                     Wait(0)
                                     if IsControlJustPressed(0, 38) then
-                                        OpenCityhallMenu()
+                                        openCityhallMenu()
                                         Wait(500)
                                         lib.hideTextUI()
                                     end
