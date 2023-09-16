@@ -7,8 +7,7 @@ local blips = {}
 -- Functions
 
 local function getClosestHall()
-    local playerPed = cache.ped
-    local playerCoords = GetEntityCoords(playerPed)
+    local playerCoords = GetEntityCoords(cache.ped)
     local distance = #(playerCoords - Config.Cityhalls[1].coords)
     local closest = 1
     for i = 1, #Config.Cityhalls do
