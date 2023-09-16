@@ -10,14 +10,8 @@ local availableJobs = {
 
 -- Functions
 
-local function giveStarterItems()
-    local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    if not Player then return end
-    exports['um-idcard']:CreateMetaLicense(src, {'id_card', 'driver_license'})
-    for _, v in pairs(QBCore.Shared.StarterItems) do
-        exports.ox_inventory:AddItem(src, v.item, 1)
-    end
+local function giveIds(source)
+    exports['um-idcard']:CreateMetaLicense(source, {'id_card', 'driver_license'})
 end
 
 local function getClosestHall(pedCoords)
@@ -64,16 +58,16 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
     end
-    if itemInfo.itemName == "id_card" then
+    if itemInfo.item == "id_card" then
         exports['um-idcard']:CreateMetaLicense(src, 'id_card')
-    elseif itemInfo.itemName == "driver_license" then
+    elseif itemInfo.item == "driver_license" then
         exports['um-idcard']:CreateMetaLicense(src, 'driver_license')
-    elseif itemInfo.itemName == "weaponlicense" then
+    elseif itemInfo.item == "weaponlicense" then
         exports['um-idcard']:CreateMetaLicense(src, 'weaponlicense')
     else
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
-    local licenseItem = exports.ox_inventory:GetItem(src, itemInfo.itemName, nil, false)
+    local licenseItem = exports.ox_inventory:GetItem(src, itemInfo.item, nil, false)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.item_received', {label = licenseItem.label, cost = itemInfo.cost}), 'success')
 end)
 
@@ -119,7 +113,9 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
 
-RegisterNetEvent('qbx-core:server:createCharacter', giveStarterItems)
+RegisterNetEvent('qbx-core:server:createCharacter', function()
+    giveIds(source)
+end)
 
 -- Commands
 
