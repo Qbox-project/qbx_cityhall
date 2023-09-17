@@ -114,9 +114,8 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
 end)
 
 RegisterNetEvent('qbx-core:server:createCharacter', function()
-    local src = source
-    if not src then return end
-    giveIds(src)
+    if GetInvokingResource() then return end
+    giveIds(source)
 end)
 
 -- Commands
