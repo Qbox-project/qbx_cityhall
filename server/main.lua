@@ -10,6 +10,10 @@ local availableJobs = {
 
 -- Functions
 
+local function giveIds(src)
+    exports['um-idcard']:CreateMetaLicense(src, {'id_card', 'driver_license'})
+end
+
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - Config.Cityhalls[1].coords)
     local closest = 1
@@ -107,6 +111,12 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     end
     Player.Functions.SetJob(job, 0)
     TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
+end)
+
+RegisterNetEvent('qbx-core:server:createCharacter', function()
+    local src = source
+    if not src then return end
+    giveIds(src)
 end)
 
 -- Commands

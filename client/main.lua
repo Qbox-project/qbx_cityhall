@@ -6,10 +6,6 @@ local blips = {}
 
 -- Functions
 
-local function giveIds(source)
-    exports['um-idcard']:CreateMetaLicense(source, {'id_card', 'driver_license'})
-end
-
 local function getClosestHall()
     local playerPed = cache.ped
     local playerCoords = GetEntityCoords(playerPed)
@@ -317,12 +313,6 @@ end)
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deleteBlips()
     deletePeds()
-end)
-
-RegisterNetEvent('qbx-core:server:createCharacter', function()
-    local src = source
-    if not src then return end
-    giveIds(src)
 end)
 
 RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
