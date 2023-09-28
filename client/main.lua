@@ -74,7 +74,7 @@ local function openCityhallIdentityMenu(closestCityhall)
     lib.showContext('cityhall_identity_menu')
 end
 
-local function openCityhallEmploymentMenu(closestCityhall)
+local function openCityhallEmploymentMenu()
     lib.callback('qb-cityhall:server:receiveJobs', false, function(result)
         local jobOptions = {}
         for job, label in pairsInOrder(result) do
@@ -125,13 +125,13 @@ local function openCityhallMenu()
                 title = Lang:t('info.employment'),
                 description = Lang:t('info.select_job'),
                 onSelect = function()
-                    openCityhallEmploymentMenu(closestCityhall)
+                    openCityhallEmploymentMenu()
                 end
             }
         }
     })
     lib.showContext('cityhall_menu')
-    if not Config.UseTarget or bool then return end
+    if not Config.UseTarget then return end
     inRangeCityhall = false
 end
 
@@ -204,7 +204,6 @@ local function spawnPeds()
         TaskStartScenarioInPlace(ped, current.scenario, true, true)
         current.pedHandle = ped
         if Config.UseTarget then
-            local opts = nil
             if current.drivingschool then
                 exports.ox_target:addLocalEntity(ped, { {
                     name = 'take_driving_test' .. i,
@@ -274,7 +273,7 @@ local function spawnPeds()
                     end
                 end
 
-                local zone = lib.zones.box({
+                lib.zones.box({
                     name = current.drivingschool and 'driving_school' or 'cityhall',
                     coords = current.coords.xyz,
                     size = vec3(2, 2, 3),
