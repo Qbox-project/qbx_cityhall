@@ -5,18 +5,17 @@ description 'QB-CityHall'
 version '3.0.0'
 
 modules {
-    'qbx-core:utils',
-    'qbx-core:core',
-    'qbx-core:playerdata',
+    'qbx_core:utils',
+    'qbx_core:playerdata',
 }
 
 shared_scripts {
-    '@qbx-core/shared/locale.lua',
+    '@qbx_core/shared/locale.lua',
     '@ox_lib/init.lua',
     'locales/en.lua',
     'locales/*.lua',
     'config.lua',
-    '@qbx-core/import.lua',
+    '@qbx_core/import.lua',
 }
 
 server_script 'server/main.lua'
