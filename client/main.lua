@@ -40,7 +40,7 @@ local function pairsInOrder(object, _)
 end
 
 local function openCityhallIdentityMenu(closestCityhall)
-    local licensesMeta = PlayerData.metadata.licences
+    local licensesMeta = QBX.PlayerData.metadata.licences
     local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
     for license in pairs(availableLicenses) do
         if license and not licensesMeta[license] then
