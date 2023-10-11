@@ -79,7 +79,7 @@ Config.Peds = {
 }
 
 Config.Employment = {
-    disable = false, -- Set to true to disable the employment menu
+    enabled = true, -- Set to false to disable the employment menu
     jobs = {
         unemployed = 'Unemployed',
         trucker = 'Trucker',
