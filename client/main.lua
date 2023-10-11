@@ -75,36 +75,54 @@ local function openCityhallIdentityMenu(closestCityhall)
 end
 
 local function openCityhallEmploymentMenu()
-    lib.callback('qb-cityhall:server:receiveJobs', false, function(result)
-        local jobOptions = {}
-        for job, label in pairsInOrder(result) do
-            jobOptions[#jobOptions + 1] = {
-                title = label,
-                onSelect = function()
-                    TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
-                    if not Config.UseTarget and inRangeCityhall then
-                        lib.showTextUI(Lang:t('info.open_cityhall'))
-                    end
-                end
-            }
-        end
-        lib.registerContext({
-            id = 'cityhall_employment_menu',
-            title = Lang:t('info.employment'),
-            menu = 'cityhall_menu',
-            onExit = function()
+    local jobOptions = {}
+    for job, label in pairsInOrder(Config.Employment.jobs) do
+        jobOptions[#jobOptions + 1] = {
+            title = label,
+            onSelect = function()
+                TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
                 if not Config.UseTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
-            end,
-            options = jobOptions
-        })
-        lib.showContext('cityhall_employment_menu')
-    end)
+            end
+        }
+    end
+    lib.registerContext({
+        id = 'cityhall_employment_menu',
+        title = Lang:t('info.employment'),
+        menu = 'cityhall_menu',
+        onExit = function()
+            if not Config.UseTarget and inRangeCityhall then
+                lib.showTextUI(Lang:t('info.open_cityhall'))
+            end
+        end,
+        options = jobOptions
+    })
+    lib.showContext('cityhall_employment_menu')
 end
 
 local function openCityhallMenu()
     local closestCityhall = getClosestHall()
+    local options = {}
+    
+    options[#options + 1] = {
+        title = Lang:t('info.identity'),
+        description = Lang:t('info.obtain_license_identity'),
+        onSelect = function()
+            openCityhallIdentityMenu(closestCityhall)
+        end
+    }
+
+    if not Config.Employment.disable then
+        options[#options + 1] = {
+            title = Lang:t('info.employment'),
+            description = Lang:t('info.select_job'),
+            onSelect = function()
+                openCityhallEmploymentMenu()
+            end
+        }
+    end
+
     lib.registerContext({
         id = 'cityhall_menu',
         title = Lang:t('info.city_hall'),
@@ -113,22 +131,7 @@ local function openCityhallMenu()
                 lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
-        options = {
-            {
-                title = Lang:t('info.identity'),
-                description = Lang:t('info.obtain_license_identity'),
-                onSelect = function()
-                    openCityhallIdentityMenu(closestCityhall)
-                end
-            },
-            {
-                title = Lang:t('info.employment'),
-                description = Lang:t('info.select_job'),
-                onSelect = function()
-                    openCityhallEmploymentMenu()
-                end
-            }
-        }
+        options = options
     })
     lib.showContext('cityhall_menu')
     if not Config.UseTarget then return end

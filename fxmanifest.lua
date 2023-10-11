@@ -1,7 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'QB-CityHall'
+description 'QBX-CityHall'
+repository 'https://github.com/Qbox-project/qbx_cityhall'
 version '3.0.0'
 
 modules {

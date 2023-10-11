@@ -1,13 +1,3 @@
-local availableJobs = {
-    ["unemployed"] = "Unemployed",
-    ["trucker"] = "Trucker",
-    ["taxi"] = "Taxi",
-    ["tow"] = "Tow Truck",
-    ["reporter"] = "News Reporter",
-    ["garbage"] = "Garbage Collector",
-    ["bus"] = "Bus Driver",
-}
-
 -- Functions
 
 local function getClosestHall(pedCoords)
@@ -38,12 +28,6 @@ local function getClosestSchool(pedCoords)
     return closest
 end
 
--- Callbacks
-
-lib.callback.register('qb-cityhall:server:receiveJobs', function()
-    return availableJobs
-end)
-
 -- Events
 
 RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
@@ -52,7 +36,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player then return end
     local itemInfo = Config.Cityhalls[hall].licenses[item]
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
-        return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
+        return exports.qbx_core:Notify(src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
     end
     local metadata = {}
     if itemInfo.item == "id_card" then
@@ -76,7 +60,8 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     else
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.item_received', {label = exports.ox_inventory:Items()[item].label, cost = itemInfo.cost}), 'success')
+    exports.ox_inventory:AddItem(src, itemInfo.item, 1, metadata)
+    exports.qbx_core:Notify(src, Lang:t('info.item_received', {label = itemInfo.label, cost = itemInfo.cost}), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
@@ -102,7 +87,7 @@ RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
             TriggerEvent("qb-phone:server:sendNewMailToOffline", citizenid, mailData)
         end
     end
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.email_sent'), 'success')
+    exports.qbx_core:Notify(src, Lang:t('info.email_sent'), 'success')
 end)
 
 RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
@@ -114,11 +99,11 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     local closestCityhall = getClosestHall(pedCoords)
     local cityhallCoords = Config.Cityhalls[closestCityhall].coords
     local JobInfo = exports.qbx_core:GetJobs()[job]
-    if #(pedCoords - cityhallCoords) >= 20.0 or not availableJobs[job] then
+    if #(pedCoords - cityhallCoords) >= 20.0 or not Config.Employment.jobs[job] then
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
     Player.Functions.SetJob(job, 0)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
+    exports.qbx_core:Notify(src, Lang:t('info.new_job', {job = JobInfo.label}), 'success')
 end)
 
 -- Commands
@@ -129,7 +114,7 @@ lib.addCommand('drivinglicense', {
         { name = 'id', type = 'playerId', help = "ID of a person" },
     }
 }, function(source, args)
-    if not args.id then return TriggerClientEvent('QBCore:Notify', source, Lang:t('error.player_not_online'), 'error') end
+    if not args.id then return exports.qbx_core:Notify(source, Lang:t('error.player_not_online'), 'error') end
 
     local Player = exports.qbx_core:GetPlayer(source)
     local SearchedPlayer = exports.qbx_core:GetPlayer(tonumber(args.id))
@@ -140,16 +125,16 @@ lib.addCommand('drivinglicense', {
                     if Config.DrivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
                         SearchedPlayer.PlayerData.metadata["licences"]["driver"] = true
                         SearchedPlayer.Functions.SetMetaData("licences", SearchedPlayer.PlayerData.metadata["licences"])
-                        TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, Lang:t('success.you_have_passed'), 'success')
-                        TriggerClientEvent('QBCore:Notify', source, Lang:t('success.license_granted'), 'success')
+                        exports.qbx_core:Notify(SearchedPlayer.PlayerData.source, Lang:t('success.you_have_passed'), 'success')
+                        exports.qbx_core:Notify(source, Lang:t('success.license_granted'), 'success')
                         break
                     end
                 end
             end
         else
-            TriggerClientEvent('QBCore:Notify', source, Lang:t('error.already_earned_license'), 'error')
+            exports.qbx_core:Notify(source, Lang:t('error.already_earned_license'), 'error')
         end
     else
-        TriggerClientEvent('QBCore:Notify', source, Lang:t('error.player_not_online'), 'error')
+        exports.qbx_core:Notify(source, Lang:t('error.player_not_online'), 'error')
     end
 end)
