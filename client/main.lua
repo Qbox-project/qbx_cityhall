@@ -113,7 +113,7 @@ local function openCityhallMenu()
         end
     }
 
-    if not Config.Employment.disable then
+    if Config.Employment.enabled then
         options[#options + 1] = {
             title = Lang:t('info.employment'),
             description = Lang:t('info.select_job'),
