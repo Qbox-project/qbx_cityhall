@@ -77,3 +77,16 @@ Config.Peds = {
         }
     }
 }
+
+Config.Employment = {
+    enabled = true, -- Set to false to disable the employment menu
+    jobs = {
+        unemployed = 'Unemployed',
+        trucker = 'Trucker',
+        taxi = 'Taxi',
+        tow = 'Tow Truck',
+        reporter = 'News Reporter',
+        garbage = 'Garbage Collector',
+        bus = 'Bus Driver'
+    }
+}
