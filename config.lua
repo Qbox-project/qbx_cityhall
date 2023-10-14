@@ -1,6 +1,6 @@
 Config = Config or {}
 
-Config.UseTarget = false -- set to true to use targeting or false to use text ui
+Config.UseTarget = false
 
 Config.Cityhalls = {
     { -- Cityhall 1
