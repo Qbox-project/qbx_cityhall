@@ -2,7 +2,7 @@ return {
     useTarget = false,
     debugPoly = false,
 
-    ped = {
+    peds = {
         { -- Cityhall Ped
             model = 'a_m_m_hasjew_01',
             coords = vec4(-262.79, -964.18, 30.22, 181.71),
