@@ -1,3 +1,6 @@
+local config = require 'config.client'
+local sharedConfig = require 'config.shared'
+
 local inRangeCityhall = false
 local inRangeDrivingSchool = false
 local pedsSpawned = false
@@ -8,10 +11,10 @@ local blips = {}
 
 local function getClosestHall()
     local playerCoords = GetEntityCoords(cache.ped)
-    local distance = #(playerCoords - Config.Cityhalls[1].coords)
+    local distance = #(playerCoords - sharedConfig.cityhalls[1].coords)
     local closest = 1
-    for i = 1, #Config.Cityhalls do
-        local hall = Config.Cityhalls[i]
+    for i = 1, #sharedConfig.cityhalls do
+        local hall = sharedConfig.cityhalls[i]
         local dist = #(playerCoords - hall.coords)
         if dist < distance then
             distance = dist
@@ -41,7 +44,7 @@ end
 
 local function openCityhallIdentityMenu(closestCityhall)
     local licensesMeta = QBX.PlayerData.metadata.licences
-    local availableLicenses = table_clone(Config.Cityhalls[closestCityhall].licenses)
+    local availableLicenses = table_clone(sharedConfig.cityhalls[closestCityhall].licenses)
     for license in pairs(availableLicenses) do
         if license and not licensesMeta[license] then
             availableLicenses[license] = nil
@@ -54,7 +57,7 @@ local function openCityhallIdentityMenu(closestCityhall)
             description = Lang:t('info.price', {cost = id.cost}),
             onSelect = function()
                 TriggerServerEvent('qb-cityhall:server:requestId', item, closestCityhall)
-                if not Config.UseTarget and inRangeCityhall then
+                if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
             end
@@ -65,7 +68,7 @@ local function openCityhallIdentityMenu(closestCityhall)
         title = Lang:t('info.identity'),
         menu = 'cityhall_menu',
         onExit = function()
-            if not Config.UseTarget and inRangeCityhall then
+            if not config.useTarget and inRangeCityhall then
                 lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
@@ -76,12 +79,12 @@ end
 
 local function openCityhallEmploymentMenu()
     local jobOptions = {}
-    for job, label in pairsInOrder(Config.Employment.jobs) do
+    for job, label in pairsInOrder(sharedConfig.employment.jobs) do
         jobOptions[#jobOptions + 1] = {
             title = label,
             onSelect = function()
                 TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
-                if not Config.UseTarget and inRangeCityhall then
+                if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
             end
@@ -92,7 +95,7 @@ local function openCityhallEmploymentMenu()
         title = Lang:t('info.employment'),
         menu = 'cityhall_menu',
         onExit = function()
-            if not Config.UseTarget and inRangeCityhall then
+            if not config.useTarget and inRangeCityhall then
                 lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
@@ -113,7 +116,7 @@ local function openCityhallMenu()
         end
     }
 
-    if Config.Employment.enabled then
+    if sharedConfig.employment.enabled then
         options[#options + 1] = {
             title = Lang:t('info.employment'),
             description = Lang:t('info.select_job'),
@@ -127,14 +130,14 @@ local function openCityhallMenu()
         id = 'cityhall_menu',
         title = Lang:t('info.city_hall'),
         onExit = function()
-            if not Config.UseTarget and inRangeCityhall then
+            if not config.useTarget and inRangeCityhall then
                 lib.showTextUI(Lang:t('info.open_cityhall'))
             end
         end,
         options = options
     })
     lib.showContext('cityhall_menu')
-    if not Config.UseTarget then return end
+    if not config.useTarget then return end
     inRangeCityhall = false
 end
 
@@ -164,8 +167,8 @@ local function deleteBlips()
 end
 
 local function initBlips()
-    for i = 1, #Config.Cityhalls do
-        local hall = Config.Cityhalls[i]
+    for i = 1, #sharedConfig.cityhalls do
+        local hall = sharedConfig.cityhalls[i]
         if hall.showBlip then
             blips[#blips + 1] = createBlip({
                 coords = hall.coords,
@@ -178,8 +181,8 @@ local function initBlips()
             })
         end
     end
-    for i = 1, #Config.DrivingSchools do
-        local school = Config.DrivingSchools[i]
+    for i = 1, #sharedConfig.drivingSchools do
+        local school = sharedConfig.drivingSchools[i]
         if school.showBlip then
             blips[#blips + 1] = createBlip({
                 coords = school.coords,
@@ -195,9 +198,9 @@ local function initBlips()
 end
 
 local function spawnPeds()
-    if not Config.Peds or not next(Config.Peds) or pedsSpawned then return end
-    for i = 1, #Config.Peds do
-        local current = Config.Peds[i]
+    if not config.peds or not next(config.peds) or pedsSpawned then return end
+    for i = 1, #config.peds do
+        local current = config.peds[i]
         current.model = type(current.model) == 'string' and joaat(current.model) or current.model
         lib.requestModel(current.model)
         local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
@@ -206,7 +209,7 @@ local function spawnPeds()
         SetBlockingOfNonTemporaryEvents(ped, true)
         TaskStartScenarioInPlace(ped, current.scenario, true, true)
         current.pedHandle = ped
-        if Config.UseTarget then
+        if config.useTarget then
             if current.drivingschool then
                 exports.ox_target:addLocalEntity(ped, { {
                     name = 'take_driving_test' .. i,
@@ -292,9 +295,9 @@ local function spawnPeds()
 end
 
 local function deletePeds()
-    if not Config.Peds or not next(Config.Peds) or not pedsSpawned then return end
-    for i = 1, #Config.Peds do
-        local current = Config.Peds[i]
+    if not config.peds or not next(config.peds) or not pedsSpawned then return end
+    for i = 1, #config.peds do
+        local current = config.peds[i]
         if current.pedHandle then
             DeletePed(current.pedHandle)
         end

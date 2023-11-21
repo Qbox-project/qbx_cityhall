@@ -1,10 +1,12 @@
+local sharedConfig = require 'config.shared'
+
 -- Functions
 
 local function getClosestHall(pedCoords)
-    local distance = #(pedCoords - Config.Cityhalls[1].coords)
+    local distance = #(pedCoords - sharedConfig.cityhalls[1].coords)
     local closest = 1
-    for i = 1, #Config.Cityhalls do
-        local hall = Config.Cityhalls[i]
+    for i = 1, #sharedConfig.cityhalls do
+        local hall = sharedConfig.cityhalls[i]
         local dist = #(pedCoords - hall.coords)
         if dist < distance then
             distance = dist
@@ -15,10 +17,10 @@ local function getClosestHall(pedCoords)
 end
 
 local function getClosestSchool(pedCoords)
-    local distance = #(pedCoords - Config.DrivingSchools[1].coords)
+    local distance = #(pedCoords - sharedConfig.drivingSchools[1].coords)
     local closest = 1
-    for i = 1, #Config.DrivingSchools do
-        local school = Config.DrivingSchools[i]
+    for i = 1, #sharedConfig.drivingSchools do
+        local school = sharedConfig.drivingSchools[i]
         local dist = #(pedCoords - school.coords)
         if dist < distance then
             distance = dist
@@ -34,7 +36,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     local src = source
     local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end
-    local itemInfo = Config.Cityhalls[hall].licenses[item]
+    local itemInfo = sharedConfig.cityhalls[hall].licenses[item]
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return exports.qbx_core:Notify(src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
     end
@@ -71,7 +73,7 @@ RegisterNetEvent('qb-cityhall:server:sendDriverTest', function()
     local ped = GetPlayerPed(src)
     local pedCoords = GetEntityCoords(ped)
     local closestDrivingSchool = getClosestSchool(pedCoords)
-    local instructors = Config.DrivingSchools[closestDrivingSchool].instructors
+    local instructors = sharedConfig.drivingSchools[closestDrivingSchool].instructors
     for i = 1, #instructors do
         local citizenid = instructors[i]
         local instructor = exports.qbx_core:GetPlayerByCitizenId(citizenid)
@@ -97,9 +99,9 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
     local ped = GetPlayerPed(src)
     local pedCoords = GetEntityCoords(ped)
     local closestCityhall = getClosestHall(pedCoords)
-    local cityhallCoords = Config.Cityhalls[closestCityhall].coords
+    local cityhallCoords = sharedConfig.cityhalls[closestCityhall].coords
     local JobInfo = exports.qbx_core:GetJobs()[job]
-    if #(pedCoords - cityhallCoords) >= 20.0 or not Config.Employment.jobs[job] then
+    if #(pedCoords - cityhallCoords) >= 20.0 or not sharedConfig.employment.jobs[job] then
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
     Player.Functions.SetJob(job, 0)
@@ -120,9 +122,9 @@ lib.addCommand('drivinglicense', {
     local SearchedPlayer = exports.qbx_core:GetPlayer(tonumber(args.id))
     if SearchedPlayer then
         if not SearchedPlayer.PlayerData.metadata["licences"]["driver"] then
-            for i = 1, #Config.DrivingSchools do
-                for id = 1, #Config.DrivingSchools[i].instructors do
-                    if Config.DrivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
+            for i = 1, #sharedConfig.drivingSchools do
+                for id = 1, #sharedConfig.drivingSchools[i].instructors do
+                    if sharedConfig.drivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
                         SearchedPlayer.PlayerData.metadata["licences"]["driver"] = true
                         SearchedPlayer.Functions.SetMetaData("licences", SearchedPlayer.PlayerData.metadata["licences"])
                         exports.qbx_core:Notify(SearchedPlayer.PlayerData.source, Lang:t('success.you_have_passed'), 'success')
