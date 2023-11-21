@@ -40,29 +40,15 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not Player.Functions.RemoveMoney("cash", itemInfo.cost) then
         return exports.qbx_core:Notify(src, Lang:t('error.not_enough_money', {cost = itemInfo.cost}), 'error')
     end
-    local metadata
     if itemInfo.item == "id_card" then
-        metadata = {
-            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
-            description = string.format('CID: %s  \nBirth date: %s  \nSex: %s  \nNationality: %s',
-            Player.PlayerData.citizenid, Player.PlayerData.charinfo.birthdate, Player.PlayerData.charinfo.gender == 0 and 'Male' or 'Female', Player.PlayerData.charinfo.nationality)
-        }
+        exports.qbx_idcard:CreateMetaLicense(src, 'id_card')
     elseif itemInfo.item == "driver_license" then
-        metadata = {
-            type = 'Class C Driver License',
-            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
-            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
-        }
+        exports.qbx_idcard:CreateMetaLicense(src, 'driver_license')
     elseif itemInfo.item == "weaponlicense" then
-        metadata = {
-            type = string.format('%s %s', Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname),
-            description = string.format('First name: %s  \nLast name: %s  \nBirth date: %s',
-            Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname, Player.PlayerData.charinfo.birthdate)
-        }
+        exports.qbx_idcard:CreateMetaLicense(src, 'weaponlicense')
     else
         return DropPlayer(src, Lang:t('error.exploit_attempt'))
     end
-    exports.ox_inventory:AddItem(src, itemInfo.item, 1, metadata)
     exports.qbx_core:Notify(src, Lang:t('info.item_received', {label = itemInfo.label, cost = itemInfo.cost}), 'success')
 end)
 
