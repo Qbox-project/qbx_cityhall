@@ -1,13 +1,9 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-
 local inRangeCityhall = false
-local inRangeDrivingSchool = false
 local pedsSpawned = false
 local table_clone = table.clone
 local blips = {}
-
--- Functions
 
 local function getClosestHall()
     local playerCoords = GetEntityCoords(cache.ped)
@@ -107,7 +103,7 @@ end
 local function openCityhallMenu()
     local closestCityhall = getClosestHall()
     local options = {}
-    
+
     options[#options + 1] = {
         title = Lang:t('info.identity'),
         description = Lang:t('info.obtain_license_identity'),
@@ -181,20 +177,6 @@ local function initBlips()
             })
         end
     end
-    for i = 1, #sharedConfig.drivingSchools do
-        local school = sharedConfig.drivingSchools[i]
-        if school.showBlip then
-            blips[#blips + 1] = createBlip({
-                coords = school.coords,
-                sprite = school.blipData.sprite,
-                display = school.blipData.display,
-                scale = school.blipData.scale,
-                colour = school.blipData.colour,
-                shortRange = true,
-                title = school.blipData.title
-            })
-        end
-    end
 end
 
 local function spawnPeds()
@@ -210,48 +192,28 @@ local function spawnPeds()
         TaskStartScenarioInPlace(ped, current.scenario, true, true)
         current.pedHandle = ped
         if config.useTarget then
-            if current.drivingschool then
-                exports.ox_target:addLocalEntity(ped, { {
-                    name = 'take_driving_test' .. i,
-                    icon = 'fa-solid fa-car-side',
-                    label = Lang:t('info.take_lessons'),
-                    distance = 1.5,
-                    onSelect = function()
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest')
-                    end
-                } })
-            elseif current.cityhall then
-                exports.ox_target:addLocalEntity(ped, { {
-                    name = 'open_cityhall' .. i,
-                    icon = 'fa-solid fa-city',
-                    label = Lang:t('info.target_open_cityhall'),
-                    distance = 1.5,
-                    debug = true,
-                    onSelect = function()
-                        inRangeCityhall = true
-                        openCityhallMenu()
-                    end
-                } })
-            end
+            exports.ox_target:addLocalEntity(ped, {{
+                name = 'open_cityhall' .. i,
+                icon = 'fa-solid fa-city',
+                label = Lang:t('info.target_open_cityhall'),
+                distance = 1.5,
+                debug = true,
+                onSelect = function()
+                    inRangeCityhall = true
+                    openCityhallMenu()
+                end
+            }})
         else
             local options = current.zoneOptions
             if options then
-                local function onEnterZone(zone)
-                    if LocalPlayer.state.isLoggedIn then
-                        if current.drivingschool and zone.name == 'driving_school' then
-                            inRangeDrivingSchool = true
-                            lib.showTextUI(Lang:t('info.e_take_lessons'))
-                            CreateThread(function()
-                                while inRangeDrivingSchool do
-                                    Wait(0)
-                                    if IsControlJustPressed(0, 38) then
-                                        TriggerServerEvent('qb-cityhall:server:sendDriverTest')
-                                        Wait(500)
-                                        lib.hideTextUI()
-                                    end
-                                end
-                            end)
-                        elseif current.cityhall and zone.name == 'cityhall' then
+                lib.zones.box({
+                    name = 'cityhall',
+                    coords = current.coords.xyz,
+                    size = vec3(2, 2, 3),
+                    rotation = current.coords.w,
+                    debug = false,
+                    onEnter = function()
+                        if LocalPlayer.state.isLoggedIn then
                             inRangeCityhall = true
                             lib.showTextUI(Lang:t('info.open_cityhall'))
                             CreateThread(function()
@@ -265,28 +227,11 @@ local function spawnPeds()
                                 end
                             end)
                         end
-                    end
-                end
-
-                local function onExitZone(zone)
-                    if (zone.name == 'driving_school') or (zone.name == 'cityhall') then
+                    end,
+                    onExit = function()
                         lib.hideTextUI()
-                        if current.drivingschool then
-                            inRangeDrivingSchool = false
-                        elseif current.cityhall then
-                            inRangeCityhall = false
-                        end
-                    end
-                end
-
-                lib.zones.box({
-                    name = current.drivingschool and 'driving_school' or 'cityhall',
-                    coords = current.coords.xyz,
-                    size = vec3(2, 2, 3),
-                    rotation = current.coords.w,
-                    debug = false,
-                    onEnter = onEnterZone,
-                    onExit = onExitZone
+                        inRangeCityhall = false
+                    end,
                 })
             end
         end
@@ -304,8 +249,6 @@ local function deletePeds()
     end
 end
 
--- Events
-
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     initBlips()
     spawnPeds()
@@ -318,17 +261,6 @@ end)
 
 RegisterNetEvent('qb-cityhall:client:getIds', function()
     TriggerServerEvent('qb-cityhall:server:getIDs')
-end)
-
-RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
-    SetTimeout(math.random(2500, 4000), function()
-        TriggerServerEvent('qb-phone:server:sendNewMail', {
-            sender = Lang:t('email.sender'),
-            subject = Lang:t('email.subject'),
-            message = Lang:t('email.message', {firstname = charinfo.firstname, lastname = charinfo.lastname, phone = charinfo.phone}),
-            button = {}
-        })
-    end)
 end)
 
 AddEventHandler('onResourceStop', function(resource)
