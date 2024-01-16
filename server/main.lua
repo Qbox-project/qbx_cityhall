@@ -14,7 +14,7 @@ local function getClosestHall(pedCoords)
     return closest
 end
 
-RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
+RegisterNetEvent('qbx_cityhall:server:requestId', function(item, hall)
     local src = source
     local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end
@@ -34,7 +34,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     exports.qbx_core:Notify(src, Lang:t('info.item_received', {label = itemInfo.label, cost = itemInfo.cost}), 'success')
 end)
 
-RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job)
+RegisterNetEvent('qbx_cityhall:server:ApplyJob', function(job)
     local src = source
     local Player = exports.qbx_core:GetPlayer(src)
     if not Player then return end

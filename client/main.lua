@@ -23,7 +23,7 @@ end
 local function pairsInOrder(object, _)
     local a = {}
     for n in pairs(object) do
-        a[#a +1] = n
+        a[#a +1 ] = n
     end
     table.sort(a, _)
     local i = 0
@@ -38,7 +38,7 @@ local function pairsInOrder(object, _)
     return iterator
 end
 
-local function openCityhallIdentityMenu(closestCityhall)
+local function openIdentificationMenu(closestCityhall)
     local licensesMeta = QBX.PlayerData.metadata.licences
     local availableLicenses = table_clone(sharedConfig.cityhalls[closestCityhall].licenses)
     for license in pairs(availableLicenses) do
@@ -52,7 +52,7 @@ local function openCityhallIdentityMenu(closestCityhall)
             title = id.label,
             description = Lang:t('info.price', {cost = id.cost}),
             onSelect = function()
-                TriggerServerEvent('qb-cityhall:server:requestId', item, closestCityhall)
+                TriggerServerEvent('qbx_cityhall:server:requestId', item, closestCityhall)
                 if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
@@ -73,13 +73,13 @@ local function openCityhallIdentityMenu(closestCityhall)
     lib.showContext('cityhall_identity_menu')
 end
 
-local function openCityhallEmploymentMenu()
+local function openEmploymentMenu()
     local jobOptions = {}
     for job, label in pairsInOrder(sharedConfig.employment.jobs) do
         jobOptions[#jobOptions + 1] = {
             title = label,
             onSelect = function()
-                TriggerServerEvent('qb-cityhall:server:ApplyJob', job)
+                TriggerServerEvent('qbx_cityhall:server:ApplyJob', job)
                 if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
@@ -108,7 +108,7 @@ local function openCityhallMenu()
         title = Lang:t('info.identity'),
         description = Lang:t('info.obtain_license_identity'),
         onSelect = function()
-            openCityhallIdentityMenu(closestCityhall)
+            openIdentificationMenu(closestCityhall)
         end
     }
 
@@ -116,9 +116,7 @@ local function openCityhallMenu()
         options[#options + 1] = {
             title = Lang:t('info.employment'),
             description = Lang:t('info.select_job'),
-            onSelect = function()
-                openCityhallEmploymentMenu()
-            end
+            onSelect = openEmploymentMenu
         }
     end
 
@@ -137,22 +135,21 @@ local function openCityhallMenu()
     inRangeCityhall = false
 end
 
-local function createBlip(options)
-    if not options.coords or type(options.coords) ~= 'table' and type(options.coords) ~= 'vector3' then return error(('createBlip() expected coords in a vector3 or table but received %s'):format(options.coords)) end
-    local blip = AddBlipForCoord(options.coords.x, options.coords.y, options.coords.z)
-    SetBlipSprite(blip, options.sprite or 1)
-    SetBlipDisplay(blip, options.display or 4)
-    SetBlipScale(blip, options.scale or 1.0)
-    SetBlipColour(blip, options.colour or 1)
-    SetBlipAsShortRange(blip, options.shortRange or false)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString(options.title or 'No Title Given')
+local function createBlip(cityhall)
+    local blip = AddBlipForCoord(cityhall.coords.x, cityhall.coords.y, cityhall.coords.z)
+    SetBlipSprite(blip, cityhall.blip.sprite or 1)
+    SetBlipDisplay(blip, cityhall.blip.display or 4)
+    SetBlipScale(blip, cityhall.blip.scale or 1.0)
+    SetBlipColour(blip, cityhall.blip.colour or 1)
+    SetBlipAsShortRange(blip, cityhall.blip.shortRange or false)
+    BeginTextCommandSetBlipName('STRING')
+    AddTextComponentString(cityhall.blip.label or 'City Hall')
     EndTextCommandSetBlipName(blip)
     return blip
 end
 
 local function deleteBlips()
-    if not next(blips) then return end
+    if not blips then return end
     for i = 1, #blips do
         local blip = blips[i]
         if DoesBlipExist(blip) then
@@ -164,18 +161,11 @@ end
 
 local function initBlips()
     for i = 1, #sharedConfig.cityhalls do
-        local hall = sharedConfig.cityhalls[i]
-        if hall.showBlip then
-            blips[#blips + 1] = createBlip({
-                coords = hall.coords,
-                sprite = hall.blipData.sprite,
-                display = hall.blipData.display,
-                scale = hall.blipData.scale,
-                colour = hall.blipData.colour,
-                shortRange = true,
-                title = hall.blipData.title
-            })
-        end
+        local cityhall = sharedConfig.cityhalls[i]
+
+        if not cityhall.showBlip or not cityhall.blip then return end
+
+        blips[#blips + 1] = createBlip({blip = cityhall.blip, coords = cityhall.coords})
     end
 end
 
@@ -254,17 +244,19 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     spawnPeds()
 end)
 
+AddEventHandler('onResourceStart', function(resource)
+    if resource ~= cache.resource then return end
+    initBlips()
+    spawnPeds()
+end)
+
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     deleteBlips()
     deletePeds()
 end)
 
-RegisterNetEvent('qb-cityhall:client:getIds', function()
-    TriggerServerEvent('qb-cityhall:server:getIDs')
-end)
-
 AddEventHandler('onResourceStop', function(resource)
-    if resource ~= GetCurrentResourceName() then return end
+    if resource ~= cache.resource then return end
     deleteBlips()
     deletePeds()
 end)
