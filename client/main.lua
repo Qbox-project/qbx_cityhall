@@ -23,7 +23,7 @@ end
 local function pairsInOrder(object, _)
     local a = {}
     for n in pairs(object) do
-        a[#a +1 ] = n
+        a[#a + 1] = n
     end
     table.sort(a, _)
     local i = 0
@@ -174,12 +174,12 @@ local function spawnPeds()
     for i = 1, #config.peds do
         local current = config.peds[i]
         current.model = type(current.model) == 'string' and joaat(current.model) or current.model
-        lib.requestModel(current.model)
+        lib.requestModel(current.model, 5000)
         local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
-        TaskStartScenarioInPlace(ped, current.scenario, true, true)
+        TaskStartScenarioInPlace(ped, current.scenario, 0, true)
         current.pedHandle = ped
         if config.useTarget then
             exports.ox_target:addLocalEntity(ped, {{
@@ -203,24 +203,18 @@ local function spawnPeds()
                     rotation = current.coords.w,
                     debug = false,
                     onEnter = function()
-                        if LocalPlayer.state.isLoggedIn then
-                            inRangeCityhall = true
-                            lib.showTextUI(Lang:t('info.open_cityhall'))
-                            CreateThread(function()
-                                while inRangeCityhall do
-                                    Wait(0)
-                                    if IsControlJustPressed(0, 38) then
-                                        openCityhallMenu()
-                                        Wait(500)
-                                        lib.hideTextUI()
-                                    end
-                                end
-                            end)
-                        end
+                        inRangeCityhall = true
+                        lib.showTextUI(Lang:t('info.open_cityhall'))
                     end,
                     onExit = function()
                         lib.hideTextUI()
                         inRangeCityhall = false
+                    end,
+                    inside = function()
+                        if IsControlJustPressed(0, 38) then
+                            openCityhallMenu()
+                            lib.hideTextUI()
+                        end
                     end,
                 })
             end
