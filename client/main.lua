@@ -52,7 +52,7 @@ local function openIdentificationMenu(closestCityhall)
             title = id.label,
             description = Lang:t('info.price', {cost = id.cost}),
             onSelect = function()
-                TriggerServerEvent('qbx_cityhall:server:requestId', item, closestCityhall)
+                lib.callback('qbx_cityhall:server:requestId', false, nil, item, closestCityhall)
                 if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
@@ -79,7 +79,7 @@ local function openEmploymentMenu()
         jobOptions[#jobOptions + 1] = {
             title = label,
             onSelect = function()
-                TriggerServerEvent('qbx_cityhall:server:ApplyJob', job)
+                lib.callback('qbx_cityhall:server:applyJob', false, nil, job)
                 if not config.useTarget and inRangeCityhall then
                     lib.showTextUI(Lang:t('info.open_cityhall'))
                 end
