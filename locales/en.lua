@@ -4,7 +4,8 @@ local Translations = {
         not_enough_money = 'You don\'t have enough money on you, you need %s cash',
         exploit_attempt = 'Attempted exploit abuse',
         player_not_online = "Player Not Online",
-        already_earned_license = 'This person has already earned this license'
+        already_earned_license = 'This person has already earned this license',
+        invalid_type = 'That is not a valid Id type...'
     },
     success = {
         recived_license = 'You have recived your %{value} for $50',
