@@ -5,6 +5,7 @@ return {
             showBlip = true,
             blip = {
                 label = 'City Services',
+                shortRange = true,
                 sprite = 487,
                 display = 4,
                 scale = 0.65,
