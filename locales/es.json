@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "No tienes suficiente efectivo contigo...",
+        "invalid_type": "That is not a valid Id type..."
+    },
+    "success": {
+        "item_recieved": "Has recibido tu ",
+        "new_job": "¡Felicidades! Ahora eres un"
+    },
+    "info": {
+        "cityhall": "Municipalidad",
+        "open_cityhall": "[E] Abrir municipalidad",
+        "target_open_cityhall": "Abrir municipalidad",
+        "identity": "Identidad",
+        "employment": "Empleo",
+        "obtain_license_identity": "Seleccionar un nuevo trabajo",
+        "select_job": "Seleccionar un nuevo trabajo",
+        "price": "Precio: %s"
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "Nemáte dostatek peněz...",
+        "invalid_type": "That is not a valid Id type..."
+    },
+    "success": {
+        "item_recieved": "Obdržel(a) jste svoji ",
+        "new_job": "Gratulujeme k nové práci!"
+    },
+    "info": {
+        "cityhall": "Radnici",
+        "open_cityhall": "[E] Otevřít radnici",
+        "target_open_cityhall": "Otevřít radnici",
+        "identity": "Identita",
+        "employment": "Zaměstnání",
+        "obtain_license_identity": "Získat řidičský průkaz nebo občanský průkaz",
+        "select_job": "Vybrat nové zaměstnání",
+        "price": "Cena: %s"
+    }
+}
