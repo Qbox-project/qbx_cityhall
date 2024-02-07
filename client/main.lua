@@ -5,8 +5,6 @@ local pedsSpawned = false
 local table_clone = table.clone
 local blips = {}
 
-lib.locale()
-
 local function getClosestHall()
     local playerCoords = GetEntityCoords(cache.ped)
     local distance = #(playerCoords - sharedConfig.cityhalls[1].coords)
