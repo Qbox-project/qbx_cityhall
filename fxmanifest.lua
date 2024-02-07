@@ -5,6 +5,8 @@ description 'qbx_cityhall'
 repository 'https://github.com/Qbox-project/qbx_cityhall'
 version '1.0.0'
 
+ox_lib 'locale'
+
 shared_scripts {
     '@ox_lib/init.lua',
 }
