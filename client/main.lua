@@ -50,22 +50,22 @@ local function openIdentificationMenu(closestCityhall)
     for item, id in pairsInOrder(availableLicenses) do
         identityOptions[#identityOptions + 1] = {
             title = id.label,
-            description = Lang:t('info.price', {cost = id.cost}),
+            description = locale('info.price', id.cost),
             onSelect = function()
                 lib.callback('qbx_cityhall:server:requestId', false, nil, item, closestCityhall)
                 if not config.useTarget and inRangeCityhall then
-                    lib.showTextUI(Lang:t('info.open_cityhall'))
+                    lib.showTextUI(locale('info.open_cityhall'))
                 end
             end
         }
     end
     lib.registerContext({
         id = 'cityhall_identity_menu',
-        title = Lang:t('info.identity'),
+        title = locale('info.identity'),
         menu = 'cityhall_menu',
         onExit = function()
             if not config.useTarget and inRangeCityhall then
-                lib.showTextUI(Lang:t('info.open_cityhall'))
+                lib.showTextUI(locale('info.open_cityhall'))
             end
         end,
         options = identityOptions
@@ -81,18 +81,18 @@ local function openEmploymentMenu()
             onSelect = function()
                 lib.callback('qbx_cityhall:server:applyJob', false, nil, job)
                 if not config.useTarget and inRangeCityhall then
-                    lib.showTextUI(Lang:t('info.open_cityhall'))
+                    lib.showTextUI(locale('info.open_cityhall'))
                 end
             end
         }
     end
     lib.registerContext({
         id = 'cityhall_employment_menu',
-        title = Lang:t('info.employment'),
+        title = locale('info.employment'),
         menu = 'cityhall_menu',
         onExit = function()
             if not config.useTarget and inRangeCityhall then
-                lib.showTextUI(Lang:t('info.open_cityhall'))
+                lib.showTextUI(locale('info.open_cityhall'))
             end
         end,
         options = jobOptions
@@ -105,8 +105,8 @@ local function openCityhallMenu()
     local options = {}
 
     options[#options + 1] = {
-        title = Lang:t('info.identity'),
-        description = Lang:t('info.obtain_license_identity'),
+        title = locale('info.identity'),
+        description = locale('info.obtain_license_identity'),
         onSelect = function()
             openIdentificationMenu(closestCityhall)
         end
@@ -114,18 +114,18 @@ local function openCityhallMenu()
 
     if sharedConfig.employment.enabled then
         options[#options + 1] = {
-            title = Lang:t('info.employment'),
-            description = Lang:t('info.select_job'),
+            title = locale('info.employment'),
+            description = locale('info.select_job'),
             onSelect = openEmploymentMenu
         }
     end
 
     lib.registerContext({
         id = 'cityhall_menu',
-        title = Lang:t('info.city_hall'),
+        title = locale('info.cityhall'),
         onExit = function()
             if not config.useTarget and inRangeCityhall then
-                lib.showTextUI(Lang:t('info.open_cityhall'))
+                lib.showTextUI(locale('info.open_cityhall'))
             end
         end,
         options = options
@@ -143,7 +143,7 @@ local function createBlip(cityhall)
     SetBlipColour(blip, cityhall.blip.colour or 1)
     SetBlipAsShortRange(blip, cityhall.blip.shortRange or false)
     BeginTextCommandSetBlipName('STRING')
-    AddTextComponentString(cityhall.blip.label or 'City Hall')
+    AddTextComponentString(cityhall.blip.label or locale('info.cityhall'))
     EndTextCommandSetBlipName(blip)
     return blip
 end
@@ -185,7 +185,7 @@ local function spawnPeds()
             exports.ox_target:addLocalEntity(ped, {{
                 name = 'open_cityhall' .. i,
                 icon = 'fa-solid fa-city',
-                label = Lang:t('info.target_open_cityhall'),
+                label = locale('info.target_open_cityhall'),
                 distance = 1.5,
                 debug = true,
                 onSelect = function()
@@ -204,7 +204,7 @@ local function spawnPeds()
                     debug = false,
                     onEnter = function()
                         inRangeCityhall = true
-                        lib.showTextUI(Lang:t('info.open_cityhall'))
+                        lib.showTextUI(locale('info.open_cityhall'))
                     end,
                     onExit = function()
                         lib.hideTextUI()

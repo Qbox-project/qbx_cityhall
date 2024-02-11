@@ -1,5 +1,4 @@
 local sharedConfig = require 'config.shared'
-local JOBS = exports.qbx_core:GetJobs()
 
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - sharedConfig.cityhalls[1].coords)
@@ -32,15 +31,15 @@ lib.callback.register('qbx_cityhall:server:requestId', function(source, item, ha
     local itemType = sharedConfig.cityhalls[hall].licenses[item]
 
     if itemType.item ~= 'id_card' and itemType.item ~= 'driver_license' and itemType.item ~= 'weaponlicense' then
-        return exports.qbx_core:Notify(source, Lang:t('error.invalid_type'), 'error')
+        return exports.qbx_core:Notify(source, locale('error.invalid_type'), 'error')
     end
 
     if not player.Functions.RemoveMoney('cash', itemType.cost) then
-        return exports.qbx_core:Notify(source, Lang:t('error.not_enough_money', {cost = itemType.cost}), 'error')
+        return exports.qbx_core:Notify(source, locale('error.not_enough_money'), 'error')
     end
 
     exports.qbx_idcard:CreateMetaLicense(source, itemType.item)
-    exports.qbx_core:Notify(source, Lang:t('info.item_received', {label = itemType.label, cost = itemType.cost}), 'success')
+    exports.qbx_core:Notify(source, locale('success.item_recieved') .. itemType.label, 'success')
 end)
 
 lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
@@ -48,5 +47,5 @@ lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
     if not player or not distanceCheck(source, job) then return end
 
     player.Functions.SetJob(job, 0)
-    exports.qbx_core:Notify(source, Lang:t('info.new_job', {job = JOBS[job].label}), 'success')
+    exports.qbx_core:Notify(source, locale('success.new_job'), 'success')
 end)

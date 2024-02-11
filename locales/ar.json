@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "You don't have enough money...",
+        "invalid_type": "That is not a valid Id type..."
+    },
+    "success": {
+        "item_recieved": "You have received your ",
+        "new_job": "مبروك الوظيفة"
+    },
+    "info": {
+        "cityhall": "ﻒﻴﻇﻮﺘﻟﺍ ﺰﻛﺮﻣ",
+        "open_cityhall": "[E] Open Cityhall",
+        "target_open_cityhall": "Open Cityhall",
+        "identity": "Identity",
+        "employment": "Employment",
+        "obtain_license_identity": "Obtain your licenses",
+        "select_job": "Select a new job",
+        "price": "Price: %s"
+    }
+}
