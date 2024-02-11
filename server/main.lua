@@ -1,5 +1,4 @@
 local sharedConfig = require 'config.shared'
-local JOBS = exports.qbx_core:GetJobs()
 
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - sharedConfig.cityhalls[1].coords)
