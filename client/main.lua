@@ -4,6 +4,7 @@ local inRangeCityhall = false
 local pedsSpawned = false
 local table_clone = table.clone
 local blips = {}
+local JOBS = exports.qbx_core:GetJobs()
 
 local function getClosestHall()
     local playerCoords = GetEntityCoords(cache.ped)
@@ -75,9 +76,21 @@ end
 
 local function openEmploymentMenu()
     local jobOptions = {}
-    for job, label in pairsInOrder(sharedConfig.employment.jobs) do
+    local sortedJobs = {}
+
+    for job, data in pairs(JOBS) do
+        if data.enableCityHall then
+            table.insert(sortedJobs, job)
+        end
+    end
+
+    table.sort(sortedJobs, function(a, b)
+        return JOBS[a].label < JOBS[b].label
+    end)
+
+    for _, job in ipairs(sortedJobs) do
         jobOptions[#jobOptions + 1] = {
-            title = label,
+            title = JOBS[job].label,
             onSelect = function()
                 lib.callback('qbx_cityhall:server:applyJob', false, nil, job)
                 if not config.useTarget and inRangeCityhall then
@@ -86,6 +99,7 @@ local function openEmploymentMenu()
             end
         }
     end
+
     lib.registerContext({
         id = 'cityhall_employment_menu',
         title = locale('info.employment'),
