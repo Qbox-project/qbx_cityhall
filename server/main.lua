@@ -1,4 +1,5 @@
 local sharedConfig = require 'config.shared'
+local JOBS = exports.qbx_core:GetJobs()
 
 local function getClosestHall(pedCoords)
     local distance = #(pedCoords - sharedConfig.cityhalls[1].coords)
@@ -19,7 +20,7 @@ local function distanceCheck(source, job)
     local pedCoords = GetEntityCoords(ped)
     local closestCityhall = getClosestHall(pedCoords)
     local cityhallCoords = sharedConfig.cityhalls[closestCityhall].coords
-    if #(pedCoords - cityhallCoords) >= 20.0 or not sharedConfig.employment.jobs[job] then
+    if #(pedCoords - cityhallCoords) >= 20.0 or not JOBS[job] then
         return false
     end
     return true
