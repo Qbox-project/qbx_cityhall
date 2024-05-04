@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "Não tens dinheiro suficiente...",
+        "invalid_type": "Esse não é um tipo de identificação válido..."
+    },
+    "success": {
+        "item_recieved": "Recebeste o teu ",
+        "new_job": "Parabéns pelo teu novo emprego!"
+    },
+    "info": {
+        "cityhall": "Câmara Municipal",
+        "open_cityhall": "[E] Abrir Câmara Municipal",
+        "target_open_cityhall": "Abrir Câmara Municipal",
+        "identity": "Identidade",
+        "employment": "Emprego",
+        "obtain_license_identity": "Obter as tuas licenças",
+        "select_job": "Selecionar um novo emprego",
+        "price": "Preço: %s€"
+    }
+}
