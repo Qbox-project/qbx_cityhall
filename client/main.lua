@@ -176,6 +176,7 @@ local function spawnPeds()
         current.model = type(current.model) == 'string' and joaat(current.model) or current.model
         lib.requestModel(current.model, 5000)
         local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
+        SetModelAsNoLongerNeeded(current.model)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
