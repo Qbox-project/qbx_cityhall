@@ -1,20 +1,20 @@
 {
-    "error": {
-        "not_enough_money": "You don't have enough money...",
-        "invalid_type": "That is not a valid Id type..."
-    },
-    "success": {
-        "item_recieved": "You have received your ",
-        "new_job": "Yeni işin için tebrikler!"
-    },
-    "info": {
-        "cityhall": "Cityhall",
-        "open_cityhall": "[E] Open Cityhall",
-        "target_open_cityhall": "Open Cityhall",
-        "identity": "Identity",
-        "employment": "Employment",
-        "obtain_license_identity": "Obtain your licenses",
-        "select_job": "Select a new job",
-        "price": "Price: %s"
-    }
+  "error": {
+    "not_enough_money": "Yeterli paran yok...",
+    "invalid_type": "Bu geçerli bir kimlik türü değil..."
+  },
+  "success": {
+    "item_recieved": "Eşyanı aldın ",
+    "new_job": "Yeni işinde tebrikler!"
+  },
+  "info": {
+    "cityhall": "Belediye",
+    "open_cityhall": "[E] Belediyeyi Aç",
+    "target_open_cityhall": "Belediyeyi Aç",
+    "identity": "Kimlik",
+    "employment": "Meslekler",
+    "obtain_license_identity": "Lisanslarını Al",
+    "select_job": "Yeni bir iş seç",
+    "price": "Fiyat: $%s"
+  }
 }
