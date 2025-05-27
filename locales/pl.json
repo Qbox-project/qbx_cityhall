@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "Nie masz wystarczająco pieniędzy...",
+        "invalid_type": "To nie jest poprawny typ dokumentu..."
+    },
+    "success": {
+        "item_recieved": "Otrzymano ",
+        "new_job": "Gratulacje, otrzymano nową pracę!"
+    },
+    "info": {
+        "cityhall": "Ratusz",
+        "open_cityhall": "[E] Otwórz ratusz",
+        "target_open_cityhall": "Otwórz ratusz",
+        "identity": "Dowód osobisty",
+        "employment": "Zatrudnienie",
+        "obtain_license_identity": "Odbierz swoje dokumenty",
+        "select_job": "Wybierz nową pracę",
+        "price": "Cena: $%s"
+    }
+}
