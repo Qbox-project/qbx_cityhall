@@ -1,7 +1,8 @@
 {
     "error": {
         "not_enough_money": "You don't have enough money...",
-        "invalid_type": "That is not a valid Id type..."
+        "invalid_type": "That is not a valid Id type...",
+        "invalid_job": "That is not a valid job..."
     },
     "success": {
         "item_recieved": "You have received your ",
