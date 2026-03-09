@@ -1,0 +1,20 @@
+{
+    "error": {
+        "not_enough_money": "お金が足りません...",
+        "invalid_type": "無効なIDタイプです..."
+    },
+    "success": {
+        "item_recieved": "受け取りました：",
+        "new_job": "新しいお仕事、おめでとうございます！"
+    },
+    "info": {
+        "cityhall": "市役所",
+        "open_cityhall": "[E] 市役所を開く",
+        "target_open_cityhall": "市役所を開く",
+        "identity": "身分証明",
+        "employment": "就職",
+        "obtain_license_identity": "免許・身分証を取得する",
+        "select_job": "新しい仕事を選ぶ",
+        "price": "価格: $%s"
+    }
+}
