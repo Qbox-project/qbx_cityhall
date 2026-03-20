@@ -43,9 +43,21 @@ lib.callback.register('qbx_cityhall:server:requestId', function(source, item, ha
 end)
 
 lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
+    if not sharedConfig.employment.enabled then
+        lib.print.error((
+            'Weird applyJob attempt while employment is disabled | source=%s | name=%s | requestedJob=%s'
+        ):format(source, GetPlayerName(source), tostring(job)))
+        return false
+    end
+
     local player = exports.qbx_core:GetPlayer(source)
     if not player or not distanceCheck(source, job) then return end
 
+    if not sharedConfig.employment.jobs[job] then
+        exports.qbx_core:Notify(source, locale('error.invalid_job'), 'error')
+        return false
+    end
+    
     player.Functions.SetJob(job, 0)
     exports.qbx_core:Notify(source, locale('success.new_job'), 'success')
 end)
