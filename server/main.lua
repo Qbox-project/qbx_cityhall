@@ -44,7 +44,9 @@ end)
 
 lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
     if not sharedConfig.employment.enabled then
-        print('Job applications are currently disabled')
+        lib.print.error((
+            'Weird applyJob attempt while employment is disabled | source=%s | name=%s | requestedJob=%s'
+        ):format(source, GetPlayerName(source), tostring(job)))
         return false
     end
 
