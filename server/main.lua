@@ -14,32 +14,54 @@ local function getClosestHall(pedCoords)
     return closest
 end
 
-local function distanceCheck(source, job)
+local function isNearCityhall(source, hall)
+    if type(hall) ~= 'number' or hall % 1 ~= 0 then return false end
+
+    local cityhall = sharedConfig.cityhalls[hall]
+    if not cityhall then return false end
+
     local ped = GetPlayerPed(source)
+    if ped == 0 then return false end
+
+    local pedCoords = GetEntityCoords(ped)
+    return #(pedCoords - cityhall.coords) < 20.0
+end
+
+local function employmentDistanceCheck(source, job)
+    if type(job) ~= 'string' or not sharedConfig.employment.jobs[job] then return false end
+
+    local ped = GetPlayerPed(source)
+    if ped == 0 then return false end
+
     local pedCoords = GetEntityCoords(ped)
     local closestCityhall = getClosestHall(pedCoords)
-    local cityhallCoords = sharedConfig.cityhalls[closestCityhall].coords
-    if #(pedCoords - cityhallCoords) >= 20.0 or not sharedConfig.employment.jobs[job] then
-        return false
-    end
-    return true
+    return #(pedCoords - sharedConfig.cityhalls[closestCityhall].coords) < 20.0
 end
 
 lib.callback.register('qbx_cityhall:server:requestId', function(source, item, hall)
     local player = exports.qbx_core:GetPlayer(source)
-    if not player then return end
+    if not player or type(item) ~= 'string' or not isNearCityhall(source, hall) then return false end
+
     local itemType = sharedConfig.cityhalls[hall].licenses[item]
+    local licences = player.PlayerData.metadata.licences
+    if not itemType or not licences or licences[item] ~= true then
+        exports.qbx_core:Notify(source, locale('error.invalid_type'), 'error')
+        return false
+    end
 
     if itemType.item ~= 'id_card' and itemType.item ~= 'driver_license' and itemType.item ~= 'weaponlicense' then
-        return exports.qbx_core:Notify(source, locale('error.invalid_type'), 'error')
+        exports.qbx_core:Notify(source, locale('error.invalid_type'), 'error')
+        return false
     end
 
     if not player.Functions.RemoveMoney('cash', itemType.cost) then
-        return exports.qbx_core:Notify(source, locale('error.not_enough_money'), 'error')
+        exports.qbx_core:Notify(source, locale('error.not_enough_money'), 'error')
+        return false
     end
 
     exports.qbx_idcard:CreateMetaLicense(source, itemType.item)
     exports.qbx_core:Notify(source, locale('success.item_recieved') .. itemType.label, 'success')
+    return true
 end)
 
 lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
@@ -51,7 +73,7 @@ lib.callback.register('qbx_cityhall:server:applyJob', function(source, job)
     end
 
     local player = exports.qbx_core:GetPlayer(source)
-    if not player or not distanceCheck(source, job) then return end
+    if not player or not employmentDistanceCheck(source, job) then return false end
 
     if not sharedConfig.employment.jobs[job] then
         exports.qbx_core:Notify(source, locale('error.invalid_job'), 'error')
