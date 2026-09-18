@@ -1,20 +1,21 @@
 {
     "error": {
-        "not_enough_money": "You don't have enough money...",
-        "invalid_type": "That is not a valid Id type..."
+        "not_enough_money": "Je hebt niet genoeg geld...",
+        "invalid_type": "Dat is geen geldig ID-type...",
+        "invalid_job": "Dat is geen geldige baan..."
     },
     "success": {
-        "item_recieved": "You have received your ",
+        "item_recieved": "Je hebt je ",
         "new_job": "Gefeliciteerd met je nieuwe baan!"
     },
     "info": {
-        "cityhall": "Cityhall",
-        "open_cityhall": "[E] Open Cityhall",
-        "target_open_cityhall": "Open Cityhall",
-        "identity": "Identity",
-        "employment": "Employment",
-        "obtain_license_identity": "Obtain your licenses",
-        "select_job": "Select a new job",
-        "price": "Price: %s"
+        "cityhall": "Stadhuis",
+        "open_cityhall": "[E] Stadhuis openen",
+        "target_open_cityhall": "Stadhuis openen",
+        "identity": "Identiteit",
+        "employment": "Werk",
+        "obtain_license_identity": "Je licenties ophalen",
+        "select_job": "Een nieuwe baan kiezen",
+        "price": "Prijs: $%s"
     }
 }
